@@ -1,0 +1,10 @@
+package pages
+
+import (
+	"github.com/Laegas/habitville/templates/components"
+)
+
+templ Index() {
+	@components.Heading3("HabitVille")
+  @components.Link("/add_habit", "Add habit")
+}

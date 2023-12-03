@@ -1,0 +1,36 @@
+version: '3'
+
+dotenv: ['.env']
+
+tasks:
+  loadenv:
+    cmds:
+      - export $(grep -v '^#' .env | xargs -L1)
+
+  build:
+    cmds:
+      - go build -o ./tmp/main .
+
+  serve:
+    cmds:
+      - air
+
+  schema-apply:
+    cmds:
+      - atlas schema apply --env turso --dev-url "sqlite://dev?mode=memory"
+
+  schema-inspect:
+    cmds:
+      - atlas schema inspect --env turso --format '{{ sql . "  " }}'
+
+  schema-inspect-hcl:
+    cmds:
+      - atlas schema inspect --env turso
+
+  sqlcg:
+    cmds:
+      - sqlc generate
+
+  turso-shell:
+    cmds:
+      - turso db shell creative-violet

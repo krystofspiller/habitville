@@ -1,0 +1,10 @@
+package pages
+
+import (
+	"github.com/Laegas/habitville/templates/components"
+	"github.com/Laegas/habitville/models/types"
+)
+
+templ CreateHabit() {
+	@components.Input(types.Text, "Habit", "habit")
+}
