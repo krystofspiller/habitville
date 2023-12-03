@@ -23,7 +23,7 @@ func initRouter(cfg *controllers.ApiConfig) http.Handler {
 	app.Handle("/add_habit", templ.Handler(templates.BaseHtml(pages.CreateHabit())))
 
 	// API
-	api.Get("/hello", cfg.HelloHandler)
+	api.Post("/habits", cfg.CreateHabitHandler)
 
 	// Mount app and API
 	r.Mount("/", app)

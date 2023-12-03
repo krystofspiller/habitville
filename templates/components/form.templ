@@ -1,9 +1,12 @@
 package components
 
-templ Form(contents templ.Component) {
-  <form hx-post="/api/create_habit">
-    <div class="grid gap-6 mb-6 md:grid-cols-2">
-      @contents
+import "github.com/Laegas/habitville/models/types"
+
+templ Form(endpoint string) {
+  <form hx-post={ endpoint }>
+    <div class="grid gap-6 mb-6">
+      { children... }
     </div>
+    @Button(types.Submit, "Submit")
   </form>
 }

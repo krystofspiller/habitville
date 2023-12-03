@@ -17,13 +17,25 @@ tasks:
 
   schema-apply:
     cmds:
+      - atlas schema apply --env local --dev-url "sqlite://dev?mode=memory"
+
+  schema-apply-turso:
+    cmds:
       - atlas schema apply --env turso --dev-url "sqlite://dev?mode=memory"
 
   schema-inspect:
     cmds:
+      - atlas schema inspect --env local --format '{{ sql . "  " }}'
+
+  schema-inspect-turso:
+    cmds:
       - atlas schema inspect --env turso --format '{{ sql . "  " }}'
 
   schema-inspect-hcl:
+    cmds:
+      - atlas schema inspect --env local
+
+  schema-inspect-hcl-turso:
     cmds:
       - atlas schema inspect --env turso
 

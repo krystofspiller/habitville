@@ -3,13 +3,23 @@ variable "db_token" {
   default = getenv("TURSO_TOKEN")
 }
 
-variable "db_url" {
+variable "turso_db_url" {
   type    = string
   default = getenv("TURSO_URL_ATLAS")
 }
 
+variable "schema_src" {
+  type    = string
+  default = "file://schema.sql"
+}
+
 env "turso" {
-  src     = "file://schema.sql"
-  url     = "${var.db_url}?authToken=${var.db_token}"
+  src     = var.schema_src
+  url     = "${var.turso_db_url}?authToken=${var.db_token}"
   exclude = ["_litestream*"]
+}
+
+env "local" {
+  src     = var.schema_src
+  url     = "sqlite://file.db"
 }

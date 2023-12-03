@@ -11,12 +11,21 @@ import (
 	"github.com/Laegas/habitville/internal/database"
 	"github.com/joho/godotenv"
 	_ "github.com/libsql/libsql-client-go/libsql"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
 	godotenv.Load()
 
-	connectionString := os.Getenv("TURSO_URL") + "?authToken=" + os.Getenv("TURSO_TOKEN")
+	var connectionString string
+
+	if os.Getenv("LOCAL") == "true" {
+		fmt.Println("Using local DB")
+		connectionString = "file:./file.db"
+	} else {
+		fmt.Println("Using Turso DB")
+		connectionString = os.Getenv("TURSO_URL") + "?authToken=" + os.Getenv("TURSO_TOKEN")
+	}
 
 	db, err := sql.Open("libsql", connectionString)
 	if err != nil {
@@ -37,5 +46,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("End")
 }

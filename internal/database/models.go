@@ -4,10 +4,39 @@
 
 package database
 
-import ()
+import (
+	"database/sql"
+)
+
+type Habit struct {
+	ID      int64   `json:"id"`
+	UserID  int64   `json:"user_id"`
+	Name    string  `json:"name"`
+	Revenue float64 `json:"revenue"`
+}
+
+type PerformedHabit struct {
+	UserID    int64        `json:"user_id"`
+	HabitID   int64        `json:"habit_id"`
+	CreatedAt sql.NullTime `json:"created_at"`
+}
+
+type PerformedReward struct {
+	UserID    int64        `json:"user_id"`
+	RewardID  int64        `json:"reward_id"`
+	CreatedAt sql.NullTime `json:"created_at"`
+}
+
+type Reward struct {
+	ID     int64   `json:"id"`
+	UserID int64   `json:"user_id"`
+	Name   string  `json:"name"`
+	Cost   float64 `json:"cost"`
+}
 
 type User struct {
-	ID        int64  `json:"id"`
-	Name      string `json:"name"`
-	ManagerID int64  `json:"manager_id"`
+	ID       int64           `json:"id"`
+	Email    sql.NullString  `json:"email"`
+	Password sql.NullString  `json:"password"`
+	Balance  sql.NullFloat64 `json:"balance"`
 }

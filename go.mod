@@ -6,8 +6,10 @@ require (
 	github.com/a-h/templ v0.2.476
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/go-chi/cors v1.2.1
+	github.com/gorilla/schema v1.2.1
 	github.com/joho/godotenv v1.5.1
 	github.com/libsql/libsql-client-go v0.0.0-20231116123136-ff4e46c3d3a1
+	github.com/mattn/go-sqlite3 v1.14.18
 )
 
 require (

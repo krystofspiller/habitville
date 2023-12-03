@@ -6,5 +6,8 @@ import (
 )
 
 templ CreateHabit() {
-	@components.Input(types.Text, "Habit", "habit")
+	@components.Form("/api/habits") {
+		@components.Input(types.Text, "Habit name", "name")
+		@components.Input(types.Number, "Revenue", "revenue")
+	}
 }

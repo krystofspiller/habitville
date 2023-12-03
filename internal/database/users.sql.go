@@ -7,28 +7,51 @@ package database
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users(name, manager_id)
-VALUES (?, ?)
-RETURNING id, name, manager_id
+INSERT INTO users(email, password, balance)
+VALUES (?, ?, ?)
+RETURNING id, email, password, balance
 `
 
 type CreateUserParams struct {
-	Name      string `json:"name"`
-	ManagerID int64  `json:"manager_id"`
+	Email    sql.NullString  `json:"email"`
+	Password sql.NullString  `json:"password"`
+	Balance  sql.NullFloat64 `json:"balance"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.Name, arg.ManagerID)
+	row := q.db.QueryRowContext(ctx, createUser, arg.Email, arg.Password, arg.Balance)
 	var i User
-	err := row.Scan(&i.ID, &i.Name, &i.ManagerID)
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Password,
+		&i.Balance,
+	)
+	return i, err
+}
+
+const selectUser = `-- name: SelectUser :one
+SELECT id, email, password, balance FROM users WHERE id=?
+`
+
+func (q *Queries) SelectUser(ctx context.Context, id int64) (User, error) {
+	row := q.db.QueryRowContext(ctx, selectUser, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Password,
+		&i.Balance,
+	)
 	return i, err
 }
 
 const selectUsers = `-- name: SelectUsers :many
-SELECT id, name, manager_id FROM users
+SELECT id, email, password, balance FROM users
 `
 
 func (q *Queries) SelectUsers(ctx context.Context) ([]User, error) {
@@ -40,7 +63,12 @@ func (q *Queries) SelectUsers(ctx context.Context) ([]User, error) {
 	var items []User
 	for rows.Next() {
 		var i User
-		if err := rows.Scan(&i.ID, &i.Name, &i.ManagerID); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Email,
+			&i.Password,
+			&i.Balance,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
