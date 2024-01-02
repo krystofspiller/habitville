@@ -8,30 +8,17 @@ import (
 	"database/sql"
 )
 
-type Habit struct {
-	ID      int64   `json:"id"`
-	UserID  int64   `json:"user_id"`
-	Name    string  `json:"name"`
-	Revenue float64 `json:"revenue"`
-}
-
-type PerformedHabit struct {
-	UserID    int64        `json:"user_id"`
-	HabitID   int64        `json:"habit_id"`
-	CreatedAt sql.NullTime `json:"created_at"`
-}
-
-type PerformedReward struct {
-	UserID    int64        `json:"user_id"`
-	RewardID  int64        `json:"reward_id"`
-	CreatedAt sql.NullTime `json:"created_at"`
-}
-
-type Reward struct {
+type Action struct {
 	ID     int64   `json:"id"`
 	UserID int64   `json:"user_id"`
 	Name   string  `json:"name"`
 	Cost   float64 `json:"cost"`
+}
+
+type PerformedAction struct {
+	ID        int64        `json:"id"`
+	ActionID  int64        `json:"action_id"`
+	CreatedAt sql.NullTime `json:"created_at"`
 }
 
 type User struct {

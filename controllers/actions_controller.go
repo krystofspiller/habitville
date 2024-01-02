@@ -10,7 +10,7 @@ import (
 
 var decoder = schema.NewDecoder()
 
-func (cfg *ApiConfig) CreateHabitHandler(w http.ResponseWriter, r *http.Request) {
+func (cfg *ApiConfig) CreateActionHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Something went wrong")
@@ -18,8 +18,8 @@ func (cfg *ApiConfig) CreateHabitHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	type parameters struct {
-		Name    string  `schema:"name"`
-		Revenue float64 `schema:"revenue"`
+		Name string  `schema:"name"`
+		Cost float64 `schema:"cost"`
 	}
 
 	var params parameters
@@ -30,17 +30,18 @@ func (cfg *ApiConfig) CreateHabitHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	fmt.Printf("Name: %v, revenue: %f", params.Name, params.Revenue)
+	// TODO remove
+	fmt.Printf("Name: %v, revenue: %f", params.Name, params.Cost)
 
-	habit, err := cfg.DB.CreateHabit(r.Context(), database.CreateHabitParams{
-		Name:    params.Name,
-		UserID:  1, // TODO hardcoded
-		Revenue: params.Revenue,
+	_, err = cfg.DB.CreateAction(r.Context(), database.CreateActionParams{
+		Name:   params.Name,
+		UserID: 1, // TODO hardcoded
+		Cost:   params.Cost,
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, habit)
+	redirect(w, "/")
 }

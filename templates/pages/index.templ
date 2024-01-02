@@ -1,10 +1,18 @@
 package pages
 
 import (
+	"github.com/Laegas/habitville/internal/database"
 	"github.com/Laegas/habitville/templates/components"
 )
 
-templ Index() {
+func actionsToRows() []Row {
+	rows := make([]Row, 0)
+
+
+}
+
+templ Index(actions []database.Action) {
 	@components.Heading3("HabitVille")
-  @components.Link("/add_habit", "Add habit")
+	@components.Table([]string{"Name", "Cost"}, actionsToRows())
+  @components.Link("/add_action", "Create new action")
 }

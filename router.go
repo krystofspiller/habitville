@@ -20,10 +20,10 @@ func initRouter(cfg *controllers.ApiConfig) http.Handler {
 
 	// App
 	app.Handle("/", templ.Handler(templates.BaseHtml(pages.Index())))
-	app.Handle("/add_habit", templ.Handler(templates.BaseHtml(pages.CreateHabit())))
+	app.Handle("/add_action", templ.Handler(templates.BaseHtml(pages.CreateAction())))
 
 	// API
-	api.Post("/habits", cfg.CreateHabitHandler)
+	api.Post("/actions", cfg.CreateActionHandler)
 
 	// Mount app and API
 	r.Mount("/", app)

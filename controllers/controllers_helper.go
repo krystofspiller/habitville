@@ -26,11 +26,13 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(dat)
 }
 
-func respondWithHTML(w http.ResponseWriter, html string, redirect *string) {
+func respondWithHTML(w http.ResponseWriter, html string) {
 	w.Header().Set("Content-Type", "text/html")
-	if redirect != nil || *redirect != "" {
-		w.Header().Set("HX-Redirect", *redirect)
-	}
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(html))
+}
+
+func redirect(w http.ResponseWriter, url string) {
+	w.Header().Set("HX-Redirect", url)
+	w.WriteHeader(http.StatusOK)
 }
