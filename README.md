@@ -2,6 +2,8 @@
 
 Todo:
 
+* Migrate to SvelteKit
+
 * [ ] Design app skeleton
   * [ ] Create daily habit
   * [ ] Add currency

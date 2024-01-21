@@ -1,6 +1,4 @@
 file.db
 .env
 
-*_templ.go
-
 tmp

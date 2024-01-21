@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Laegas/habitville/internal/database"
+	"main/api/internal/database"
+
 	"github.com/gorilla/schema"
 )
 

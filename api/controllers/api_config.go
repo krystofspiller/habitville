@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/Laegas/habitville/internal/database"
+	"main/api/internal/database"
 )
 
 type ApiConfig struct {

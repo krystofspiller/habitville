@@ -1,4 +1,4 @@
-module github.com/Laegas/habitville
+module main
 
 go 1.21.1
 
