@@ -12,16 +12,21 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Action {
+    id               Int               @id @default(autoincrement())
+    name             String
+    cost             Decimal
+    createdBy        User              @relation(fields: [createdById], references: [id])
+    createdById      String
+    performedActions PerformedAction[]
+}
 
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
-
-    @@index([name])
+model PerformedAction {
+    id       Int     @id @default(autoincrement())
+    name     String
+    cost     Decimal
+    action   Action  @relation(fields: [actionId], references: [id])
+    actionId Int
 }
 
 // Necessary for Next auth
@@ -57,9 +62,10 @@ model User {
     email         String?   @unique
     emailVerified DateTime?
     image         String?
+    balance       Decimal   @default(0)
     accounts      Account[]
     sessions      Session[]
-    posts         Post[]
+    actions       Action[]
 }
 
 model VerificationToken {
