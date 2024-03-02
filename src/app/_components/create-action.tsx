@@ -1,26 +1,26 @@
-"use client";
+'use client'
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
-import { api } from "~/trpc/react";
+import { api } from '~/trpc/react'
 
 export function CreateAction() {
-  const router = useRouter();
-  const [name, setName] = useState("");
+  const router = useRouter()
+  const [name, setName] = useState('')
 
   const createAction = api.action.create.useMutation({
     onSuccess: () => {
-      router.refresh();
-      setName("");
+      router.refresh()
+      setName('')
     },
-  });
+  })
 
   return (
     <form
       onSubmit={(e) => {
-        e.preventDefault();
-        createAction.mutate({ name });
+        e.preventDefault()
+        createAction.mutate({ name })
       }}
       className="flex flex-col gap-2"
     >
@@ -36,8 +36,8 @@ export function CreateAction() {
         className="rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20"
         disabled={createAction.isLoading}
       >
-        {createAction.isLoading ? "Submitting..." : "Submit"}
+        {createAction.isLoading ? 'Submitting...' : 'Submit'}
       </button>
     </form>
-  );
+  )
 }

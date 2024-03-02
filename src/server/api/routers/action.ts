@@ -1,6 +1,6 @@
-import { z } from "zod";
+import { z } from 'zod'
 
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from '~/server/api/trpc'
 
 export const actionRouter = createTRPCRouter({
   create: protectedProcedure
@@ -12,13 +12,12 @@ export const actionRouter = createTRPCRouter({
           cost: 100,
           createdBy: { connect: { id: ctx.session.user.id } },
         },
-      });
+      })
     }),
 
   index: protectedProcedure.query(({ ctx }) => {
-    return ctx.db.action.findFirst({
-      orderBy: { name: "desc" },
+    return ctx.db.action.findMany({
       where: { createdBy: { id: ctx.session.user.id } },
-    });
+    })
   }),
-});
+})
