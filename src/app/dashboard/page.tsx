@@ -1,9 +1,20 @@
-import { Anchor, Button, Grid, GridCol, Title, Tooltip } from '@mantine/core'
-import { Progress } from '@mantine/core'
+import {
+  Anchor,
+  Button,
+  Grid,
+  GridCol,
+  Title,
+  Tooltip,
+  Progress,
+} from '@mantine/core'
 import { ActionsTable } from '~/app/_components/actions-table/actions-table'
 import { DomainValue } from '~/app/_components/domain-value/domain-value'
 import { IconPlus } from '@tabler/icons-react'
 import Link from 'next/link'
+
+export const metadata = {
+  title: 'Dashboard',
+}
 
 export default async function Page() {
   return (
@@ -17,7 +28,7 @@ export default async function Page() {
         <div className="flex items-center gap-2">
           Level: X
           <div className="w-24">
-            <Progress color="violet" value={70} />
+            <Progress classNames={{ section: 'bg-violet-600' }} value={70} />
           </div>
         </div>
       </GridCol>

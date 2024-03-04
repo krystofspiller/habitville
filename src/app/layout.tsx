@@ -15,7 +15,10 @@ const inter = Inter({
 })
 
 export const metadata = {
-  title: 'HabitVille',
+  title: {
+    template: '%s | HabitVille',
+    default: 'HabitVille',
+  },
   description: 'Gamify your habits',
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
 }

@@ -4,7 +4,7 @@ import { createTRPCRouter, protectedProcedure } from '~/server/api/trpc'
 
 export const actionRouter = createTRPCRouter({
   create: protectedProcedure
-    .input(z.object({ name: z.string().min(1) }))
+    .input(z.object({ name: z.string().min(1), cost: z.number().int() }))
     .mutation(({ ctx, input }) => {
       return ctx.db.action.create({
         data: {

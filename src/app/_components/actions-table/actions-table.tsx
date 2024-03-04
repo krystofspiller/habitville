@@ -1,29 +1,38 @@
 'use client'
 
-import { Button, Table } from '@mantine/core'
-import { IconCheck } from '@tabler/icons-react'
+import { Button, Loader, Table } from '@mantine/core'
+import {
+  IconSquareRoundedArrowDown,
+  IconSquareRoundedArrowUp,
+  IconCheck,
+} from '@tabler/icons-react'
 import { DomainValue } from '~/app/_components/domain-value/domain-value'
+import { api } from '~/trpc/react'
 
 export function ActionsTable() {
-  const data = [
-    {
-      id: 1,
-      name: 'Pushups',
-      cost: 10,
-    },
-    {
-      id: 1,
-      name: 'Chips',
-      cost: -10,
-    },
-  ]
+  const userActions = api.action.index.useQuery()
+
+  const data = userActions.data ?? []
+
+  if (userActions.isLoading) {
+    return (
+      <div className="flex w-full justify-center">
+        <Loader color="orange" />
+      </div>
+    )
+  }
 
   const rows = data.map((row) => {
     return (
       <Table.Tr key={row.id}>
         <Table.Td>{row.name}</Table.Td>
         <Table.Td>
-          <DomainValue value={row.cost} currency="RP" showIcon />
+          {row.cost >= 0 && (
+            <DomainValue value={row.cost} currency={['RP', 'XP']} />
+          )}
+        </Table.Td>
+        <Table.Td>
+          {row.cost < 0 && <DomainValue value={row.cost} currency="RP" />}
         </Table.Td>
         <Table.Td className="flex justify-end">
           <Button
@@ -39,12 +48,28 @@ export function ActionsTable() {
   })
 
   return (
-    <Table.ScrollContainer minWidth={800}>
+    <Table.ScrollContainer minWidth="100%">
       <Table verticalSpacing="xs">
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Action</Table.Th>
-            <Table.Th>Potential cost</Table.Th>
+            <Table.Th>
+              <div className="flex items-center gap-1">
+                <div className="text-blue-600">
+                  <IconSquareRoundedArrowUp />
+                </div>{' '}
+                Reward
+              </div>
+            </Table.Th>
+            <Table.Th>
+              <div className="flex items-center gap-1">
+                <div className="text-red-600">
+                  <IconSquareRoundedArrowDown />
+                </div>{' '}
+                Cost
+              </div>
+            </Table.Th>
+
             <Table.Th></Table.Th>
           </Table.Tr>
         </Table.Thead>

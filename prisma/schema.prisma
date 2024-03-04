@@ -15,17 +15,17 @@ datasource db {
 model Action {
     id               Int               @id @default(autoincrement())
     name             String
-    cost             Decimal
+    cost             Float
     createdBy        User              @relation(fields: [createdById], references: [id])
     createdById      String
     performedActions PerformedAction[]
 }
 
 model PerformedAction {
-    id       Int     @id @default(autoincrement())
+    id       Int    @id @default(autoincrement())
     name     String
-    cost     Decimal
-    action   Action  @relation(fields: [actionId], references: [id])
+    cost     Float
+    action   Action @relation(fields: [actionId], references: [id])
     actionId Int
 }
 
@@ -62,7 +62,7 @@ model User {
     email         String?   @unique
     emailVerified DateTime?
     image         String?
-    balance       Decimal   @default(0)
+    balance       Float     @default(0)
     accounts      Account[]
     sessions      Session[]
     actions       Action[]

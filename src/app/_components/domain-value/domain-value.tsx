@@ -1,42 +1,39 @@
 'use client'
 
-import {
-  IconPointFilled,
-  IconSquareRoundedArrowDown,
-  IconSquareRoundedArrowUp,
-} from '@tabler/icons-react'
+import { Tooltip } from '@mantine/core'
+import { IconPointFilled } from '@tabler/icons-react'
+
+type AcceptedCurrency = 'RP' | 'XP'
 
 export function DomainValue({
   value,
   currency = 'RP',
-  showIcon = false,
   showCurrencyLabel = false,
 }: {
   value: number
-  currency?: 'RP' | 'XP'
-  showIcon?: boolean
+  currency?: AcceptedCurrency | AcceptedCurrency[]
   showCurrencyLabel?: boolean
 }) {
-  const className = currency === 'RP' ? 'text-blue-600' : 'text-orange-600'
+  const getClassName = (currency: AcceptedCurrency) =>
+    currency === 'RP' ? 'text-blue-600' : 'text-violet-600'
+
+  const tooltipLabel = Array.isArray(currency)
+    ? `Get ${value} ${currency.join(` and ${value} `)}`
+    : null
 
   return (
-    <div className="flex w-40 items-center">
-      {showIcon && (
-        <div
-          className={`flex flex-row gap-1 ${value >= 0 ? 'text-blue-600' : 'text-red-600'}`}
-        >
-          {value >= 0 ? (
-            <IconSquareRoundedArrowUp />
-          ) : (
-            <IconSquareRoundedArrowDown />
-          )}
-        </div>
-      )}
-      <div className={className}>
-        <IconPointFilled />
+    <Tooltip disabled={!tooltipLabel} label={tooltipLabel} color="gray">
+      <div className="flex items-center">
+        {(Array.isArray(currency) ? currency : [currency]).map((c) => (
+          <>
+            <div className={`${getClassName(c)} -ml-1.5`}>
+              <IconPointFilled />
+            </div>
+            {showCurrencyLabel ? `${c}: ` : ''}
+          </>
+        ))}
+        {value}
       </div>
-      {showCurrencyLabel ? `${currency}: ` : ''}
-      {value}
-    </div>
+    </Tooltip>
   )
 }
