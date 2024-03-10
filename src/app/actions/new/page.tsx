@@ -1,15 +1,24 @@
 'use client'
 
-import { TextInput, Button, NumberInput } from '@mantine/core'
+import { Button, NumberInput, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconPlus } from '@tabler/icons-react'
+import { type z } from 'zod'
+import { zodResolver } from 'mantine-form-zod-resolver'
+import { api } from '~/trpc/react'
+import { actionNewPayloadSchema } from '~/app/_schemas/actions-new'
+
+type ActionNewPayloadSchema = z.infer<typeof actionNewPayloadSchema>
 
 export default function Page() {
+  const createAction = api.action.create.useMutation()
+
   const form = useForm({
     initialValues: {
       name: '',
       cost: 0,
     },
+    validate: zodResolver(actionNewPayloadSchema),
   })
 
   const costLabel =
@@ -19,17 +28,21 @@ export default function Page() {
         ? 'Reward'
         : 'Cost'
 
+  const onSubmit = (values: ActionNewPayloadSchema) => {
+    createAction.mutate(values)
+  }
+
   return (
     <div className="flex justify-center w-full">
       <form
         className="flex flex-col gap-2 w-96"
-        onSubmit={form.onSubmit((values) => console.log(values))}
+        onSubmit={form.onSubmit(onSubmit)}
       >
         <TextInput
           withAsterisk
           label="Name"
           placeholder="Do pushups; Read a book; etc."
-          {...form.getInputProps('email')}
+          {...form.getInputProps('name')}
         />
 
         <NumberInput
@@ -54,3 +67,5 @@ export default function Page() {
     </div>
   )
 }
+
+export { actionNewPayloadSchema }

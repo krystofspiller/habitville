@@ -1,80 +1,85 @@
 'use client'
 
-import { Button, Loader, Table } from '@mantine/core'
+import {
+  Loader,
+  Table,
+  TableScrollContainer,
+  TableTbody,
+  TableTd,
+  TableTh,
+  TableThead,
+  TableTr,
+} from '@mantine/core'
 import {
   IconSquareRoundedArrowDown,
   IconSquareRoundedArrowUp,
-  IconCheck,
 } from '@tabler/icons-react'
+import { ActionsMenu } from '~/app/_components/actions-table/actions-menu'
 import { DomainValue } from '~/app/_components/domain-value/domain-value'
 import { api } from '~/trpc/react'
 
 export function ActionsTable() {
   const userActions = api.action.index.useQuery()
 
-  const data = userActions.data ?? []
-
-  if (userActions.isLoading) {
+  if (!userActions.data || userActions.isLoading) {
     return (
-      <div className="flex w-full justify-center">
-        <Loader color="orange" />
+      <div className="flex justify-center w-full">
+        <Loader size={24} color="orange" />
       </div>
     )
   }
 
-  const rows = data.map((row) => {
+  if (userActions.data.length === 0) {
+    return 'No actions yet. Add one by clicking "Add action" button.'
+  }
+
+  const rows = userActions.data.map((row) => {
     return (
-      <Table.Tr key={row.id}>
-        <Table.Td>{row.name}</Table.Td>
-        <Table.Td>
+      <TableTr key={row.id}>
+        <TableTd>{row.name}</TableTd>
+        <TableTd>
           {row.cost >= 0 && (
             <DomainValue value={row.cost} currency={['RP', 'XP']} />
           )}
-        </Table.Td>
-        <Table.Td>
+        </TableTd>
+        <TableTd>
           {row.cost < 0 && <DomainValue value={row.cost} currency="RP" />}
-        </Table.Td>
-        <Table.Td className="flex justify-end">
-          <Button
-            leftSection={<IconCheck size={14} />}
-            variant="outline"
-            color="green"
-          >
-            Mark done
-          </Button>
-        </Table.Td>
-      </Table.Tr>
+        </TableTd>
+        <TableTd className="flex justify-end">
+          <ActionsMenu actionId={row.id} actionName={row.name} />
+        </TableTd>
+      </TableTr>
     )
   })
 
   return (
-    <Table.ScrollContainer minWidth="100%">
+    <TableScrollContainer minWidth="100%">
       <Table verticalSpacing="xs">
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>Action</Table.Th>
-            <Table.Th>
+        <TableThead>
+          <TableTr>
+            <TableTh>Action</TableTh>
+            <TableTh>
               <div className="flex items-center gap-1">
                 <div className="text-blue-600">
                   <IconSquareRoundedArrowUp />
                 </div>{' '}
                 Reward
               </div>
-            </Table.Th>
-            <Table.Th>
+            </TableTh>
+            <TableTh>
               <div className="flex items-center gap-1">
                 <div className="text-red-600">
                   <IconSquareRoundedArrowDown />
                 </div>{' '}
                 Cost
               </div>
-            </Table.Th>
+            </TableTh>
 
-            <Table.Th></Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>{rows}</Table.Tbody>
+            <TableTh></TableTh>
+          </TableTr>
+        </TableThead>
+        <TableTbody>{rows}</TableTbody>
       </Table>
-    </Table.ScrollContainer>
+    </TableScrollContainer>
   )
 }

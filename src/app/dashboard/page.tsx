@@ -1,16 +1,8 @@
-import {
-  Anchor,
-  Button,
-  Grid,
-  GridCol,
-  Title,
-  Tooltip,
-  Progress,
-} from '@mantine/core'
-import { ActionsTable } from '~/app/_components/actions-table/actions-table'
-import { DomainValue } from '~/app/_components/domain-value/domain-value'
+import { Anchor, Button, Grid, GridCol, Title } from '@mantine/core'
 import { IconPlus } from '@tabler/icons-react'
 import Link from 'next/link'
+import { ActionsTable } from '~/app/_components/actions-table/actions-table'
+import { ValueBar } from '~/app/_components/value-bar/value-bar'
 
 export const metadata = {
   title: 'Dashboard',
@@ -19,18 +11,8 @@ export const metadata = {
 export default async function Page() {
   return (
     <Grid>
-      <GridCol span={{ base: 12 }} className="flex justify-between">
-        <Tooltip label="Realized potential" color="gray">
-          <div>
-            <DomainValue value={100} currency="RP" showCurrencyLabel />
-          </div>
-        </Tooltip>
-        <div className="flex items-center gap-2">
-          Level: X
-          <div className="w-24">
-            <Progress classNames={{ section: 'bg-violet-600' }} value={70} />
-          </div>
-        </div>
+      <GridCol span={{ base: 12 }}>
+        <ValueBar />
       </GridCol>
       <GridCol span={{ base: 12 }}>
         <div className="flex justify-between">

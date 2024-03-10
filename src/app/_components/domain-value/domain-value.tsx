@@ -2,6 +2,7 @@
 
 import { Tooltip } from '@mantine/core'
 import { IconPointFilled } from '@tabler/icons-react'
+import { Fragment } from 'react'
 
 type AcceptedCurrency = 'RP' | 'XP'
 
@@ -25,12 +26,12 @@ export function DomainValue({
     <Tooltip disabled={!tooltipLabel} label={tooltipLabel} color="gray">
       <div className="flex items-center">
         {(Array.isArray(currency) ? currency : [currency]).map((c) => (
-          <>
+          <Fragment key={c}>
             <div className={`${getClassName(c)} -ml-1.5`}>
               <IconPointFilled />
             </div>
             {showCurrencyLabel ? `${c}: ` : ''}
-          </>
+          </Fragment>
         ))}
         {value}
       </div>

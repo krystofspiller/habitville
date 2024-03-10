@@ -31,7 +31,7 @@ export function Navbar() {
     <nav className={classes.navbar}>
       <div className={classes.navbarMain}>
         <Group className={classes.header} justify="space-between">
-          <h1>HabitVille</h1>
+          <span>HabitVille</span>
         </Group>
         {links}
       </div>

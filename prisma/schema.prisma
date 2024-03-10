@@ -16,6 +16,7 @@ model Action {
     id               Int               @id @default(autoincrement())
     name             String
     cost             Float
+    archived         Boolean           @default(false)
     createdBy        User              @relation(fields: [createdById], references: [id])
     createdById      String
     performedActions PerformedAction[]
@@ -23,8 +24,6 @@ model Action {
 
 model PerformedAction {
     id       Int    @id @default(autoincrement())
-    name     String
-    cost     Float
     action   Action @relation(fields: [actionId], references: [id])
     actionId Int
 }
@@ -63,6 +62,8 @@ model User {
     emailVerified DateTime?
     image         String?
     balance       Float     @default(0)
+    xp            Int       @default(0)
+    score         Int       @default(0)
     accounts      Account[]
     sessions      Session[]
     actions       Action[]

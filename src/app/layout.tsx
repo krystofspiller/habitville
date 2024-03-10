@@ -1,5 +1,6 @@
 import '~/styles/globals.css'
 import '@mantine/core/styles.css'
+import '@mantine/notifications/styles.css'
 
 import { ColorSchemeScript, MantineProvider } from '@mantine/core'
 
@@ -8,6 +9,7 @@ import { Inter } from 'next/font/google'
 import { TRPCReactProvider } from '~/trpc/react'
 import { Navbar } from '~/app/_components/navbar'
 import { ContentLayout } from '~/app/_components/content-layout'
+import { Notifications } from '@mantine/notifications'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -36,6 +38,7 @@ export default function RootLayout({
       <body className={`font-sans ${inter.variable}`}>
         <TRPCReactProvider>
           <MantineProvider defaultColorScheme="dark">
+            <Notifications />
             <main className="flex">
               <Navbar />
               <ContentLayout>{children}</ContentLayout>

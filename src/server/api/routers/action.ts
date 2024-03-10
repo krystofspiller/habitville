@@ -1,23 +1,95 @@
 import { z } from 'zod'
+import { actionNewPayloadSchema } from '~/app/_schemas/actions-new'
 
 import { createTRPCRouter, protectedProcedure } from '~/server/api/trpc'
 
 export const actionRouter = createTRPCRouter({
   create: protectedProcedure
-    .input(z.object({ name: z.string().min(1), cost: z.number().int() }))
+    .input(actionNewPayloadSchema)
     .mutation(({ ctx, input }) => {
       return ctx.db.action.create({
         data: {
           name: input.name,
-          cost: 100,
+          cost: input.cost,
           createdBy: { connect: { id: ctx.session.user.id } },
         },
       })
     }),
 
-  index: protectedProcedure.query(({ ctx }) => {
-    return ctx.db.action.findMany({
-      where: { createdBy: { id: ctx.session.user.id } },
-    })
-  }),
+  index: protectedProcedure
+    .input(
+      z
+        .object({
+          includeArchived: z.boolean().optional(),
+        })
+        .optional(),
+    )
+    .query(({ ctx, input }) => {
+      return ctx.db.action.findMany({
+        where: {
+          createdBy: { id: ctx.session.user.id },
+          ...(input?.includeArchived ? {} : { archived: false }),
+        },
+      })
+    }),
+
+  archive: protectedProcedure
+    .input(
+      z.object({
+        actionId: z.number().int(),
+        unarchive: z.boolean().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.action.update({
+        where: { id: input.actionId },
+        data: {
+          archived: input.unarchive ? false : true,
+        },
+      })
+    }),
+
+  markDone: protectedProcedure
+    .input(
+      z.object({
+        actionId: z.number().int(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const getActionPromise = await ctx.db.action.findFirst({
+        where: { id: input.actionId, createdBy: { id: ctx.session.user.id } },
+      })
+
+      const getUserPromise = await ctx.db.user.findFirst({
+        where: { id: ctx.session.user.id },
+      })
+
+      const [action, user] = await Promise.all([
+        getActionPromise,
+        getUserPromise,
+      ])
+
+      if (!action) {
+        throw new Error('Action not found')
+      }
+      if (!user) {
+        throw new Error('User not found')
+      }
+
+      const createPerformedActionPromise = ctx.db.performedAction.create({
+        data: {
+          actionId: input.actionId,
+        },
+      })
+
+      const updateUserPromise = ctx.db.user.update({
+        where: { id: ctx.session.user.id },
+        data: {
+          balance: user.balance + action.cost,
+          xp: user.xp + action.cost,
+        },
+      })
+
+      await Promise.all([createPerformedActionPromise, updateUserPromise])
+    }),
 })
