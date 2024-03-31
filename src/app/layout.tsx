@@ -1,22 +1,22 @@
 import '~/styles/globals.css'
 import '@mantine/core/styles.css'
 import '@mantine/notifications/styles.css'
+import { type Metadata } from 'next'
 
 import { ColorSchemeScript, MantineProvider } from '@mantine/core'
 
 import { Inter } from 'next/font/google'
 
 import { TRPCReactProvider } from '~/trpc/react'
-import { Navbar } from '~/app/_components/navbar'
-import { ContentLayout } from '~/app/_components/content-layout'
 import { Notifications } from '@mantine/notifications'
+import { ContentLayout } from '~/app/_components/content-layout'
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
 })
 
-export const metadata = {
+export const metadata: Metadata = {
   title: {
     template: '%s | HabitVille',
     default: 'HabitVille',
@@ -39,10 +39,7 @@ export default function RootLayout({
         <TRPCReactProvider>
           <MantineProvider defaultColorScheme="dark">
             <Notifications />
-            <main className="flex">
-              <Navbar />
-              <ContentLayout>{children}</ContentLayout>
-            </main>
+            <ContentLayout>{children}</ContentLayout>
           </MantineProvider>
         </TRPCReactProvider>
       </body>

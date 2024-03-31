@@ -1,8 +1,8 @@
 'use client'
 
-import { Group } from '@mantine/core'
 import { IconLayoutBoard, IconLogout, IconRun } from '@tabler/icons-react'
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import classes from './navbar.module.css'
 
 const data = [
@@ -11,7 +11,12 @@ const data = [
 ]
 
 export function Navbar() {
-  const [active, setActive] = useState('Dashboard')
+  const pathname = usePathname()
+
+  const matchActive = () =>
+    data.find((item) => pathname.startsWith(item.link))?.label
+
+  const [active, setActive] = useState(matchActive())
   const links = data.map((item) => (
     <a
       className={classes.link}
@@ -29,12 +34,7 @@ export function Navbar() {
 
   return (
     <nav className={classes.navbar}>
-      <div className={classes.navbarMain}>
-        <Group className={classes.header} justify="space-between">
-          <span>HabitVille</span>
-        </Group>
-        {links}
-      </div>
+      <div className={classes.navbarMain}>{links}</div>
 
       <div className={classes.footer}>
         <a href="/api/auth/signout" className={classes.link}>

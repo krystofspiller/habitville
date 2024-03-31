@@ -10,4 +10,6 @@ type Range<F extends number, T extends number> = Exclude<
   Enumerate<F>
 >
 
-export type { Range }
+type Unpacked<T> = T extends (infer U)[] ? U : T
+
+export type { Range, Unpacked }

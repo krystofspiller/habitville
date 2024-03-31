@@ -23,9 +23,10 @@ model Action {
 }
 
 model PerformedAction {
-    id       Int    @id @default(autoincrement())
-    action   Action @relation(fields: [actionId], references: [id])
-    actionId Int
+    id        Int      @id @default(autoincrement())
+    action    Action   @relation(fields: [actionId], references: [id])
+    actionId  Int
+    performed DateTime @default(now())
 }
 
 // Necessary for Next auth

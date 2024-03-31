@@ -1,32 +1,33 @@
 'use client'
 
-import { Button, Menu } from '@mantine/core'
+import { Button, Menu, Tooltip } from '@mantine/core'
 import { IconCheck, IconDots, IconArchive } from '@tabler/icons-react'
 import { api } from '~/trpc/react'
 import { notifications } from '@mantine/notifications'
+import { type ActionIndexOutput } from '~/server/api/routers/action'
+import { type Unpacked } from '~/util/types'
 
 export function ActionsMenu({
-  actionId,
-  actionName,
+  action,
 }: {
-  actionId: number
-  actionName: string
+  action: Unpacked<ActionIndexOutput>
 }) {
   const utils = api.useUtils()
-  const markDoneMutation = api.action.markDone.useMutation({
+  const markCompletedMutation = api.action.markCompleted.useMutation({
     onSuccess: () => {
       notifications.show({
-        color: 'orange',
-        message: `Action ${actionName} was completed`,
+        color: 'green',
+        message: `Action ${action.name} was completed`,
       })
       void utils.user.get.invalidate()
+      void utils.action.index.invalidate()
     },
   })
   const archiveMutation = api.action.archive.useMutation({
     onSuccess: () => {
       notifications.show({
-        color: 'orange',
-        message: `Action ${actionName} was archived`,
+        color: 'red',
+        message: `Action ${action.name} was archived`,
       })
       void utils.action.index.invalidate()
     },
@@ -35,8 +36,8 @@ export function ActionsMenu({
   return (
     <Menu
       trigger="click-hover"
-      openDelay={100}
-      closeDelay={100}
+      openDelay={0}
+      closeDelay={300}
       position="bottom-end"
       withArrow
       arrowPosition="center"
@@ -53,25 +54,36 @@ export function ActionsMenu({
         <Button
           color="gray"
           classNames={{
-            root: 'w-8 h-8 p-0 rounded-full',
+            root: 'w-6 h-6 p-0 rounded-full',
           }}
         >
-          <IconDots className="w-6" />
+          <IconDots className="w-5" />
         </Button>
       </Menu.Target>
 
       <Menu.Dropdown>
-        <Menu.Item
-          onClick={() => markDoneMutation.mutate({ actionId })}
-          color="green"
-          leftSection={<IconCheck size={14} />}
+        <Tooltip
+          disabled={!action.performedRecently}
+          label="Already done in the last 24 hours"
+          color="gray"
         >
-          Mark done
-        </Menu.Item>
+          <div>
+            <Menu.Item
+              onClick={() =>
+                markCompletedMutation.mutate({ actionId: action.id })
+              }
+              color="green"
+              leftSection={<IconCheck size={14} />}
+              disabled={action.performedRecently}
+            >
+              Mark completed
+            </Menu.Item>
+          </div>
+        </Tooltip>
         <Menu.Divider />
         <Menu.Label>Danger zone</Menu.Label>
         <Menu.Item
-          onClick={() => archiveMutation.mutate({ actionId })}
+          onClick={() => archiveMutation.mutate({ actionId: action.id })}
           color="gray"
           leftSection={<IconArchive size={14} />}
         >

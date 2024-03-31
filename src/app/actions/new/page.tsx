@@ -7,11 +7,23 @@ import { type z } from 'zod'
 import { zodResolver } from 'mantine-form-zod-resolver'
 import { api } from '~/trpc/react'
 import { actionNewPayloadSchema } from '~/app/_schemas/actions-new'
+import { notifications } from '@mantine/notifications'
+import { navigate } from '~/app/navigate'
 
 type ActionNewPayloadSchema = z.infer<typeof actionNewPayloadSchema>
 
 export default function Page() {
-  const createAction = api.action.create.useMutation()
+  const createAction = api.action.create.useMutation({
+    onSuccess: async () => {
+      notifications.show({
+        color: 'green',
+        message: `Action ${form.values.name} was created`,
+      })
+      await navigate('/dashboard')
+    },
+  })
+
+  const isLoading = createAction.isLoading
 
   const form = useForm({
     initialValues: {
@@ -42,6 +54,7 @@ export default function Page() {
           withAsterisk
           label="Name"
           placeholder="Do pushups; Read a book; etc."
+          disabled={isLoading}
           {...form.getInputProps('name')}
         />
 
@@ -50,6 +63,7 @@ export default function Page() {
           label={costLabel}
           description="Use positive numbers for rewards and negative for costs"
           placeholder="5"
+          disabled={isLoading}
           {...form.getInputProps('cost')}
         />
 
@@ -59,6 +73,7 @@ export default function Page() {
             variant="filled"
             color="orange"
             type="submit"
+            loading={isLoading}
           >
             Create action
           </Button>

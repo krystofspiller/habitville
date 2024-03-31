@@ -11,15 +11,21 @@ import {
   TableTr,
 } from '@mantine/core'
 import {
+  IconCheck,
   IconSquareRoundedArrowDown,
   IconSquareRoundedArrowUp,
+  IconX,
 } from '@tabler/icons-react'
 import { ActionsMenu } from '~/app/_components/actions-table/actions-menu'
 import { DomainValue } from '~/app/_components/domain-value/domain-value'
 import { api } from '~/trpc/react'
 
-export function ActionsTable() {
-  const userActions = api.action.index.useQuery()
+export function ActionsTable({
+  includeArchived = false,
+}: {
+  includeArchived?: boolean
+}) {
+  const userActions = api.action.index.useQuery({ includeArchived })
 
   if (!userActions.data || userActions.isLoading) {
     return (
@@ -45,9 +51,22 @@ export function ActionsTable() {
         <TableTd>
           {row.cost < 0 && <DomainValue value={row.cost} currency="RP" />}
         </TableTd>
-        <TableTd className="flex justify-end">
-          <ActionsMenu actionId={row.id} actionName={row.name} />
-        </TableTd>
+        {includeArchived && (
+          <TableTd>
+            <div className="flex items-center">
+              {row.archived ? (
+                <IconCheck color="green" />
+              ) : (
+                <IconX color="gray" />
+              )}
+            </div>
+          </TableTd>
+        )}
+        {!row.archived && (
+          <TableTd className="flex justify-end">
+            <ActionsMenu action={row} />
+          </TableTd>
+        )}
       </TableTr>
     )
   })
@@ -75,6 +94,7 @@ export function ActionsTable() {
               </div>
             </TableTh>
 
+            {includeArchived && <TableTh>Archived</TableTh>}
             <TableTh></TableTh>
           </TableTr>
         </TableThead>

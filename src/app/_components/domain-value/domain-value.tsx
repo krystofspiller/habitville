@@ -27,7 +27,7 @@ export function DomainValue({
       <div className="flex items-center">
         {(Array.isArray(currency) ? currency : [currency]).map((c) => (
           <Fragment key={c}>
-            <div className={`${getClassName(c)} -ml-1.5`}>
+            <div className={`${getClassName(c)} flex items-center -ml-1.5`}>
               <IconPointFilled />
             </div>
             {showCurrencyLabel ? `${c}: ` : ''}

@@ -1,3 +1,4 @@
+import { type inferRouterOutputs } from '@trpc/server'
 import { z } from 'zod'
 import { actionNewPayloadSchema } from '~/app/_schemas/actions-new'
 
@@ -24,13 +25,30 @@ export const actionRouter = createTRPCRouter({
         })
         .optional(),
     )
-    .query(({ ctx, input }) => {
-      return ctx.db.action.findMany({
+    .query(async ({ ctx, input }) => {
+      const actions = await ctx.db.action.findMany({
         where: {
           createdBy: { id: ctx.session.user.id },
           ...(input?.includeArchived ? {} : { archived: false }),
         },
       })
+
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+
+      const performedActions = await ctx.db.performedAction.findMany({
+        where: {
+          actionId: { in: actions.map((action) => action.id) },
+          performed: { gte: yesterday },
+        },
+      })
+
+      return actions.map((action) => ({
+        ...action,
+        performedRecently: performedActions.some(
+          (performedAction) => performedAction.actionId === action.id,
+        ),
+      }))
     }),
 
   archive: protectedProcedure
@@ -49,18 +67,18 @@ export const actionRouter = createTRPCRouter({
       })
     }),
 
-  markDone: protectedProcedure
+  markCompleted: protectedProcedure
     .input(
       z.object({
         actionId: z.number().int(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const getActionPromise = await ctx.db.action.findFirst({
+      const getActionPromise = ctx.db.action.findFirst({
         where: { id: input.actionId, createdBy: { id: ctx.session.user.id } },
       })
 
-      const getUserPromise = await ctx.db.user.findFirst({
+      const getUserPromise = ctx.db.user.findFirst({
         where: { id: ctx.session.user.id },
       })
 
@@ -79,6 +97,7 @@ export const actionRouter = createTRPCRouter({
       const createPerformedActionPromise = ctx.db.performedAction.create({
         data: {
           actionId: input.actionId,
+          performed: new Date(),
         },
       })
 
@@ -93,3 +112,9 @@ export const actionRouter = createTRPCRouter({
       await Promise.all([createPerformedActionPromise, updateUserPromise])
     }),
 })
+
+type ActionRouter = typeof actionRouter
+// type RouterInput = inferRouterInputs<ActionRouter>
+type RouterOutput = inferRouterOutputs<ActionRouter>
+
+export type ActionIndexOutput = RouterOutput['index']
