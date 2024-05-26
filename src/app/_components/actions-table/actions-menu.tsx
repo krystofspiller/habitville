@@ -4,8 +4,8 @@ import { Button, Menu, Tooltip } from '@mantine/core'
 import { IconCheck, IconDots, IconArchive } from '@tabler/icons-react'
 import { api } from '~/trpc/react'
 import { notifications } from '@mantine/notifications'
-import { type ActionIndexOutput } from '~/server/api/routers/action'
 import { type Unpacked } from '~/util/types'
+import { type ActionIndexOutput } from '~/server/api/root'
 
 export function ActionsMenu({
   action,
@@ -65,7 +65,7 @@ export function ActionsMenu({
         <Tooltip
           disabled={!action.performedRecently}
           label="Already done in the last 24 hours"
-          color="gray"
+          className="text-zinc-100 bg-zinc-800"
         >
           <div>
             <Menu.Item

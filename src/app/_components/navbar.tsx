@@ -1,6 +1,11 @@
 'use client'
 
-import { IconLayoutBoard, IconLogout, IconRun } from '@tabler/icons-react'
+import {
+  IconLayoutBoard,
+  IconLogout,
+  IconMeeple,
+  IconRun,
+} from '@tabler/icons-react'
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import classes from './navbar.module.css'
@@ -8,6 +13,7 @@ import classes from './navbar.module.css'
 const data = [
   { link: '/dashboard', label: 'Dashboard', icon: IconLayoutBoard },
   { link: '/actions', label: 'Actions', icon: IconRun },
+  { link: '/ville', label: 'Ville', icon: IconMeeple },
 ]
 
 export function Navbar() {

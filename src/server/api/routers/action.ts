@@ -1,4 +1,3 @@
-import { type inferRouterOutputs } from '@trpc/server'
 import { z } from 'zod'
 import { actionNewPayloadSchema } from '~/app/_schemas/actions-new'
 
@@ -112,9 +111,3 @@ export const actionRouter = createTRPCRouter({
       await Promise.all([createPerformedActionPromise, updateUserPromise])
     }),
 })
-
-type ActionRouter = typeof actionRouter
-// type RouterInput = inferRouterInputs<ActionRouter>
-type RouterOutput = inferRouterOutputs<ActionRouter>
-
-export type ActionIndexOutput = RouterOutput['index']

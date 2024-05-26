@@ -21,7 +21,7 @@ export function ValueBar() {
 
   return (
     <div className="flex justify-between w-full min-h-7 items-center">
-      <Tooltip label="Realized potential" color="gray">
+      <Tooltip label="Realized potential" className="text-zinc-100 bg-zinc-800">
         <div>
           <DomainValue
             value={user.data.balance}
@@ -34,7 +34,7 @@ export function ValueBar() {
         Level: {levelInfo.level}
         <Tooltip
           label={`${levelInfo.currentLevelXpProgressAbs} / ${levelInfo.xpNeededForNextLevel}`}
-          color="gray"
+          className="bg-zinc-800 text-zinc-100"
         >
           <div className="w-24">
             <Progress

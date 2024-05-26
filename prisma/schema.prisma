@@ -29,6 +29,15 @@ model PerformedAction {
     performed DateTime @default(now())
 }
 
+model Building {
+    id          Int    @id @default(autoincrement())
+    createdBy   User   @relation(fields: [createdById], references: [id])
+    createdById String
+    type        Int
+    quantity    Int
+    level       Int
+}
+
 // Necessary for Next auth
 model Account {
     id                String  @id @default(cuid())
@@ -57,17 +66,18 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String     @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?    @unique
     emailVerified DateTime?
     image         String?
-    balance       Float     @default(0)
-    xp            Int       @default(0)
-    score         Int       @default(0)
+    balance       Float      @default(0)
+    xp            Int        @default(0)
+    score         Int        @default(0)
     accounts      Account[]
     sessions      Session[]
     actions       Action[]
+    buildings     Building[]
 }
 
 model VerificationToken {

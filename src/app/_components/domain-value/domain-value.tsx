@@ -23,7 +23,11 @@ export function DomainValue({
     : null
 
   return (
-    <Tooltip disabled={!tooltipLabel} label={tooltipLabel} color="gray">
+    <Tooltip
+      disabled={!tooltipLabel}
+      label={tooltipLabel}
+      className="text-zinc-100 bg-zinc-800"
+    >
       <div className="flex items-center">
         {(Array.isArray(currency) ? currency : [currency]).map((c) => (
           <Fragment key={c}>
