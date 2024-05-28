@@ -16,81 +16,75 @@ import {
   IconSquareRoundedArrowUp,
 } from '@tabler/icons-react'
 import { BuildingsMenu } from '~/app/_components/buildings-table/buildings-menu'
+import { BUILDINGS } from '~/app/_components/buildings-table/buildings-utils'
 import { DomainValue } from '~/app/_components/domain-value/domain-value'
-// import { api } from '~/trpc/react'
+import { type EnhancedBuilding } from '~/server/app/models/building'
 
-export function BuildingsTable() {
-  // const userActions = api.action.index.useQuery()
+export function BuildingsTable({
+  buildings,
+}: {
+  buildings: EnhancedBuilding[]
+}) {
+  const rows = buildings.map((building) => {
+    const { name: buildingName, icon: BuildingIcon } = BUILDINGS[building.type]
 
-  // if (!userActions.data || userActions.isLoading) {
-  //   return (
-  //     <div className="flex justify-center w-full">
-  //       <Loader size={24} color="orange" />
-  //     </div>
-  //   )
-  // }
+    const name =
+      building.quantity > 1
+        ? `${building.quantity} ${buildingName}s`
+        : buildingName
 
-  // const rows = userActions.data.map((row) => {
-  //   return (
-  //     <TableTr key={row.id}>
-  //       <TableTd>{row.name}</TableTd>
-  //       <TableTd>
-  //         {row.cost >= 0 && (
-  //           <DomainValue value={row.cost} currency={['RP', 'XP']} />
-  //         )}
-  //       </TableTd>
-  //       <TableTd>
-  //         {row.cost < 0 && <DomainValue value={row.cost} currency="RP" />}
-  //       </TableTd>
-  //       {includeArchived && (
-  //         <TableTd>
-  //           <div className="flex items-center">
-  //             {row.archived ? (
-  //               <IconCheck color="green" />
-  //             ) : (
-  //               <IconX color="gray" />
-  //             )}
-  //           </div>
-  //         </TableTd>
-  //       )}
-  //       {!row.archived && (
-  //         <TableTd className="flex justify-end">
-  //           <ActionsMenu action={row} />
-  //         </TableTd>
-  //       )}
-  //     </TableTr>
-  //   )
-  // })
-
-  const rows = (
-    <TableTr>
-      <TableTd>Town hall</TableTd>
-      <TableTd>1</TableTd>
-      <TableTd>
-        <DomainValue value={10} currency="RP" />
-      </TableTd>
-      <TableTd>
-        <DomainValue value={20} currency="RP" />
-      </TableTd>
-      <TableTd className="flex justify-end">
-        <div className="flex items-center gap-1">
+    return (
+      <TableTr key={building.id}>
+        <TableTd>
+          <div className="flex items-center gap-1 h-full">
+            <BuildingIcon />
+            {name}
+          </div>
+        </TableTd>
+        <TableTd>{building.level}</TableTd>
+        <TableTd>
+          {building.upgradeCost < 0 ? (
+            <Tooltip
+              label={building.upgradeInfo}
+              className="text-zinc-100 bg-zinc-800"
+            >
+              <span>N/A</span>
+            </Tooltip>
+          ) : (
+            <DomainValue value={building.upgradeCost} currency="RP" />
+          )}
+        </TableTd>
+        <TableTd>
+          {building.buildCost < 0 ? (
+            <Tooltip
+              label={building.buildInfo}
+              className="text-zinc-100 bg-zinc-800"
+            >
+              <span>N/A</span>
+            </Tooltip>
+          ) : (
+            <DomainValue value={building.buildCost} currency="RP" />
+          )}
+        </TableTd>
+        <TableTd>
           <Tooltip
             label={
               <span>
-                Generates 5 score per hour at current level.
-                <br />
-                Next level: 10 score per hour.
+                Generates {building.scoreGeneration} score per hour at current
+                level.
               </span>
             }
             className="text-zinc-100 bg-zinc-800"
           >
             <IconHelp size={24} />
           </Tooltip>
-          <BuildingsMenu />
-        </div>
-      </TableTd>
-    </TableTr>
-  )
+        </TableTd>
+        <TableTd className="flex justify-end">
+          <BuildingsMenu building={building} />
+        </TableTd>
+      </TableTr>
+    )
+  })
 
   return (
     <TableScrollContainer minWidth="100%">
@@ -115,6 +109,7 @@ export function BuildingsTable() {
                 Building cost
               </div>
             </TableTh>
+            <TableTh>Info</TableTh>
             <TableTh></TableTh>
           </TableTr>
         </TableThead>

@@ -1,7 +1,6 @@
 'use client'
 
 import { Loader, Title } from '@mantine/core'
-// import { BuildingCard } from '~/app/_components/building-card/building-card'
 import { BuildingsTable } from '~/app/_components/buildings-table/buildings-table'
 import { ScoreCard } from '~/app/_components/score-card/score-card'
 import { api } from '~/trpc/react'
@@ -14,7 +13,11 @@ export default function Page() {
     <div className="flex flex-col gap-1">
       <Title size="h3">Ville</Title>
       <ScoreCard />
-      {isLoading ? <Loader size={24} color="orange" /> : <BuildingsTable />}
+      {isLoading || !buildings.data ? (
+        <Loader size={24} color="orange" />
+      ) : (
+        <BuildingsTable buildings={buildings.data} />
+      )}
     </div>
   )
 }

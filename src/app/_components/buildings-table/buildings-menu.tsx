@@ -6,30 +6,26 @@ import {
   IconSquareRoundedArrowUp,
   IconDots,
 } from '@tabler/icons-react'
-// import { api } from '~/trpc/react'
-// import { notifications } from '@mantine/notifications'
+import { api } from '~/trpc/react'
+import { notifications } from '@mantine/notifications'
+import { type EnhancedBuilding } from '~/server/app/models/building'
+import { BUILDINGS } from '~/app/_components/buildings-table/buildings-utils'
 
-export function BuildingsMenu() {
-  // const utils = api.useUtils()
-  // const markCompletedMutation = api.action.markCompleted.useMutation({
-  //   onSuccess: () => {
-  //     notifications.show({
-  //       color: 'green',
-  //       message: `Action ${action.name} was completed`,
-  //     })
-  //     void utils.user.get.invalidate()
-  //     void utils.action.index.invalidate()
-  //   },
-  // })
-  // const archiveMutation = api.action.archive.useMutation({
-  //   onSuccess: () => {
-  //     notifications.show({
-  //       color: 'red',
-  //       message: `Action ${action.name} was archived`,
-  //     })
-  //     void utils.action.index.invalidate()
-  //   },
-  // })
+export function BuildingsMenu({ building }: { building: EnhancedBuilding }) {
+  const { name: buildingName } = BUILDINGS[building.type]
+
+  const utils = api.useUtils()
+
+  const createBuilding = api.building.create.useMutation({
+    onSuccess: async () => {
+      notifications.show({
+        color: 'green',
+        message: `Building ${buildingName} was built`,
+      })
+      void utils.building.index.invalidate()
+      void utils.user.get.invalidate()
+    },
+  })
 
   return (
     <Menu
@@ -60,16 +56,18 @@ export function BuildingsMenu() {
       </Menu.Target>
 
       <Menu.Dropdown>
-        <Menu.Item
-          onClick={() => {
-            console.log('todo')
-          }}
-          className="text-green-600"
-          color="green"
-          leftSection={<IconHammer size={14} />}
-        >
-          Build
-        </Menu.Item>
+        {building.buildCost > 0 && (
+          <Menu.Item
+            onClick={() => {
+              createBuilding.mutate({ type: building.type })
+            }}
+            className="text-green-600"
+            color="green"
+            leftSection={<IconHammer size={14} />}
+          >
+            Build
+          </Menu.Item>
+        )}
         <Menu.Divider />
         <Menu.Item
           onClick={() => {
@@ -78,7 +76,7 @@ export function BuildingsMenu() {
           color="orange"
           leftSection={<IconSquareRoundedArrowUp size={14} />}
         >
-          Upgrade
+          Upgrade - TODO
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>
