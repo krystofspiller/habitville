@@ -3,7 +3,7 @@
 import { Card, Button, Tooltip, Loader } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { IconHelp } from '@tabler/icons-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   getScoreGeneration,
   type EnhancedBuilding,
@@ -11,6 +11,7 @@ import {
 import { calculateAccumulatedScore } from '~/server/app/models/user'
 import { api } from '~/trpc/react'
 import { formatScore } from '~/util/format'
+import { useCountUp } from 'use-count-up'
 
 export function ScoreCard({ buildings }: { buildings: EnhancedBuilding[] }) {
   const utils = api.useUtils()
@@ -27,43 +28,20 @@ export function ScoreCard({ buildings }: { buildings: EnhancedBuilding[] }) {
   })
 
   const { breakdown, scorePerHour } = getScoreGeneration(buildings)
-
-  const [accumulatedScore, setAccumulatedScore] = useState(
-    user.data?.scoreCollectedAt
-      ? calculateAccumulatedScore(
-          user.data?.scoreCollectedAt,
-          user.data?.warehouseCap,
-          scorePerHour,
-        )
-      : 0,
-  )
-
-  useEffect(() => {
-    if (!user.data) return
-
-    setAccumulatedScore(
-      calculateAccumulatedScore(
+  const [now] = useState(new Date())
+  const { value: secondsElapsed } = useCountUp({
+    isCounting: true,
+    decimalPlaces: 4,
+  })
+  const requestTime = new Date(now.getTime() + Number(secondsElapsed) * 1000)
+  const accumulatedScore = user.data?.scoreCollectedAt
+    ? calculateAccumulatedScore(
         user.data?.scoreCollectedAt,
         user.data?.warehouseCap,
         scorePerHour,
-      ),
-    )
-
-    const interval = setInterval(() => {
-      if (!user.data) return
-      setAccumulatedScore(
-        calculateAccumulatedScore(
-          user.data.scoreCollectedAt,
-          user.data.warehouseCap,
-          scorePerHour,
-        ),
+        requestTime,
       )
-    }, 1000)
-
-    return () => {
-      clearInterval(interval)
-    }
-  }, [scorePerHour, user.data])
+    : 0
 
   return (
     <Card className="p-5 rounded-lg w-72">
