@@ -1,7 +1,18 @@
+import { type PrismaClient } from '@prisma/client'
 import { buildingNewPayloadSchema } from '~/app/_schemas/buildings-new'
 
 import { createTRPCRouter, protectedProcedure } from '~/server/api/trpc'
 import { getEnhancedBuildings } from '~/server/app/models/building'
+
+export async function getBuildings(userId: string, db: PrismaClient) {
+  const buildings = await db.building.findMany({
+    where: {
+      createdBy: { id: userId },
+    },
+  })
+
+  return getEnhancedBuildings(buildings)
+}
 
 export const buildingRouter = createTRPCRouter({
   create: protectedProcedure
@@ -25,12 +36,6 @@ export const buildingRouter = createTRPCRouter({
     }),
 
   index: protectedProcedure.query(async ({ ctx }) => {
-    const buildings = await ctx.db.building.findMany({
-      where: {
-        createdBy: { id: ctx.session.user.id },
-      },
-    })
-
-    return getEnhancedBuildings(buildings)
+    return getBuildings(ctx.session.user.id, ctx.db)
   }),
 })

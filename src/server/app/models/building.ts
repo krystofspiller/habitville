@@ -1,14 +1,14 @@
 import { type Building } from '@prisma/client'
+import { BUILDINGS } from '~/app/_components/buildings-table/buildings-utils'
 import { BuildingType } from '~/util/enums'
 
 type BuildCostAndInfo = { buildCost: number; buildInfo?: string }
 type UpgradeCostAndInfo = { upgradeCost: number; upgradeInfo?: string }
-type ScoreGeneration = { scoreGeneration: number }
 type EnhancedBuilding = Omit<Building, 'type'> & {
   type: BuildingType
+  scoreGeneration: number
 } & BuildCostAndInfo &
-  UpgradeCostAndInfo &
-  ScoreGeneration
+  UpgradeCostAndInfo
 
 function getEnhancedBuildings(
   buildings: Array<Building>,
@@ -87,5 +87,35 @@ function getUpgradeCost(): UpgradeCostAndInfo {
   return { upgradeCost: -1, upgradeInfo: 'Upgrade not implemented' }
 }
 
-export { getEnhancedBuildings }
+function getScoreGeneration(buildings: Array<EnhancedBuilding>) {
+  return buildings.reduce(
+    (acc, building) => {
+      acc.breakdown.push({
+        scorePerHour: building.scoreGeneration,
+        name: `${BUILDINGS[building.type].name.toLowerCase()}${building.quantity > 1 ? 's' : ''}`,
+      })
+      acc.scorePerHour += building.scoreGeneration
+
+      return acc
+    },
+    {
+      breakdown: [] as { scorePerHour: number; name: string }[],
+      scorePerHour: 0,
+    },
+  )
+}
+
+function getWarehouseCap(buildings: Array<Building>): number {
+  return buildings.reduce((acc, building) => {
+    if ((building.type as BuildingType) === BuildingType.WAREHOUSE) {
+      return acc + building.quantity * 150
+    } else if ((building.type as BuildingType) === BuildingType.TOWN_HALL) {
+      return acc + 100
+    }
+
+    return acc
+  }, 0)
+}
+
+export { getEnhancedBuildings, getScoreGeneration, getWarehouseCap }
 export type { EnhancedBuilding }

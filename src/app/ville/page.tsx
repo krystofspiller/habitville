@@ -12,11 +12,13 @@ export default function Page() {
   return (
     <div className="flex flex-col gap-1">
       <Title size="h3">Ville</Title>
-      <ScoreCard />
       {isLoading || !buildings.data ? (
         <Loader size={24} color="orange" />
       ) : (
-        <BuildingsTable buildings={buildings.data} />
+        <>
+          <ScoreCard buildings={buildings.data} />
+          <BuildingsTable buildings={buildings.data} />
+        </>
       )}
     </div>
   )
