@@ -28,6 +28,9 @@
     "paths": {
       "~/*": ["./src/*"],
     },
+
+    /* Vitest */
+    "types": ["vitest/globals"],
   },
   "include": [
     ".eslintrc.cjs",
