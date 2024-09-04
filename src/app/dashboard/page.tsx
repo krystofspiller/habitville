@@ -3,6 +3,7 @@ import { IconPlus } from '@tabler/icons-react'
 import Link from 'next/link'
 import { ActionsTable } from '~/app/_components/actions-table/actions-table'
 import { type Metadata } from 'next'
+import { ScoreCard } from '~/app/_components/score-card/score-card'
 
 export const metadata: Metadata = {
   title: 'Dashboard',
@@ -27,8 +28,8 @@ export default async function Page() {
         <ActionsTable />
       </GridCol>
       <GridCol span={{ base: 12 }} className="flex flex-col gap-2">
-        <Title size="h3">Ville overview</Title>
-        Coming soon
+        <Title size="h3">Ville score</Title>
+        <ScoreCard />
       </GridCol>
     </Grid>
   )

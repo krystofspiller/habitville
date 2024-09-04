@@ -4,16 +4,18 @@ import { Card, Button, Tooltip, Loader } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { IconHelp } from '@tabler/icons-react'
 import { useState } from 'react'
-import {
-  getScoreGeneration,
-  type EnhancedBuilding,
-} from '~/server/app/models/building'
+import { getScoreGeneration } from '~/server/app/models/building'
 import { calculateAccumulatedScore } from '~/server/app/models/user'
 import { api } from '~/trpc/react'
 import { formatScore } from '~/util/format'
 import { useCountUp } from 'use-count-up'
 
-export function ScoreCard({ buildings }: { buildings: EnhancedBuilding[] }) {
+export function ScoreCard() {
+  const [now] = useState(new Date())
+  const { value: secondsElapsed } = useCountUp({
+    isCounting: true,
+    decimalPlaces: 4,
+  })
   const utils = api.useUtils()
   const user = api.user.get.useQuery()
   const markCompletedMutation = api.user.collectScore.useMutation({
@@ -26,13 +28,13 @@ export function ScoreCard({ buildings }: { buildings: EnhancedBuilding[] }) {
       void utils.action.index.invalidate()
     },
   })
+  const { data: buildings, isLoading } = api.building.index.useQuery()
+
+  if (isLoading || !buildings) {
+    return null
+  }
 
   const { breakdown, scorePerHour } = getScoreGeneration(buildings)
-  const [now] = useState(new Date())
-  const { value: secondsElapsed } = useCountUp({
-    isCounting: true,
-    decimalPlaces: 4,
-  })
   const requestTime = new Date(now.getTime() + Number(secondsElapsed) * 1000)
   const accumulatedScore = user.data?.scoreCollectedAt
     ? calculateAccumulatedScore(

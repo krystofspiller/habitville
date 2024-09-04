@@ -16,7 +16,7 @@ export default function Page() {
         <Loader size={24} color="orange" />
       ) : (
         <>
-          <ScoreCard buildings={buildings.data} />
+          <ScoreCard />
           <BuildingsTable buildings={buildings.data} />
         </>
       )}

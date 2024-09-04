@@ -17,7 +17,7 @@ export function ContentLayout({ children }: { children: React.ReactNode }) {
       <AppShell.Header>
         <Group h="100%" px="md">
           <div className="flex flex-grow items-center gap-4">
-            <div className="flex items-center w-[234px]">
+            <div className="flex items-center md:w-[234px]">
               <Burger
                 opened={opened}
                 onClick={toggle}
@@ -26,7 +26,7 @@ export function ContentLayout({ children }: { children: React.ReactNode }) {
               />
               <span>HabitVille</span>
             </div>
-            <div className="sm:hidden md:flex flex-grow">
+            <div className="hidden md:flex flex-grow">
               <ValueBar />
             </div>
           </div>
@@ -36,7 +36,7 @@ export function ContentLayout({ children }: { children: React.ReactNode }) {
         <Navbar />
       </AppShell.Navbar>
       <AppShell.Main>
-        <div className="sm:flex md:hidden pb-4">
+        <div className="flex md:hidden pb-4">
           <ValueBar />
         </div>
         {children}

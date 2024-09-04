@@ -43,9 +43,9 @@ export function ActionsMenu({
       arrowPosition="center"
       offset={5}
       classNames={{
-        dropdown: 'p-0',
+        dropdown: 'p-0 overflow-hidden',
         divider: 'm-0',
-        item: 'z-10 relative px-3 py-1.5',
+        item: 'z-10 relative px-3 py-1.5 rounded-none',
         arrow: 'z-0 absolute',
         label: 'pt-2',
       }}
@@ -65,7 +65,9 @@ export function ActionsMenu({
         <Tooltip
           disabled={!action.performedRecently}
           label="Already done in the last 24 hours"
-          className="text-zinc-100 bg-zinc-800"
+          classNames={{
+            tooltip: 'text-zinc-100 bg-zinc-800',
+          }}
         >
           <div>
             <Menu.Item
