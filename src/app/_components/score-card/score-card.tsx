@@ -7,7 +7,11 @@ import { useState } from 'react'
 import { getScoreGeneration } from '~/server/app/models/building'
 import { calculateAccumulatedScore } from '~/server/app/models/user'
 import { api } from '~/trpc/react'
-import { formatScore } from '~/util/format'
+import {
+  formatNumberCompact,
+  formatPercentage,
+  formatScore,
+} from '~/util/format'
 import { useCountUp } from 'use-count-up'
 
 export function ScoreCard() {
@@ -34,6 +38,14 @@ export function ScoreCard() {
     return null
   }
 
+  if (buildings.length === 0) {
+    return (
+      <Card className="p-5 rounded-lg w-72">
+        <div className="text-center">Build a town hall!</div>
+      </Card>
+    )
+  }
+
   const { breakdown, scorePerHour } = getScoreGeneration(buildings)
   const requestTime = new Date(now.getTime() + Number(secondsElapsed) * 1000)
   const accumulatedScore = user.data?.scoreCollectedAt
@@ -44,6 +56,17 @@ export function ScoreCard() {
         requestTime,
       )
     : 0
+  const scoreCapPercentage = user.data
+    ? accumulatedScore / user.data.warehouseCap
+    : 0
+  const scoreCapStyle =
+    scoreCapPercentage < 0.5
+      ? 'text-green-700'
+      : scoreCapPercentage < 0.8
+        ? 'text-yellow-500'
+        : scoreCapPercentage < 1
+          ? 'text-orange-500'
+          : 'text-red-500 font-bold'
 
   return (
     <Card className="p-5 rounded-lg w-72">
@@ -57,14 +80,15 @@ export function ScoreCard() {
               <Tooltip
                 label={
                   <span>
-                    Currently getting {scorePerHour} score per hour.
+                    Currently getting {formatNumberCompact(scorePerHour)} score
+                    per hour.
                     <br />
                     Breakdown:
                     <br />
                     <ul className="m-0 mt-1 pl-4">
                       {breakdown.map(({ scorePerHour, name }) => (
                         <li key={name}>
-                          {scorePerHour} from {name}
+                          {formatNumberCompact(scorePerHour)} from {name}
                         </li>
                       ))}
                     </ul>
@@ -94,10 +118,15 @@ export function ScoreCard() {
             </Tooltip>
           </div>
 
-          <div className="text-xl text-bold">
+          <div className="text-xl">
             <div className="flex items-center justify-between">
               <div>{formatScore(accumulatedScore, scorePerHour)}</div>
-              <div>/ {user.data.warehouseCap}</div>
+              <div className="flex gap-1">
+                / {formatNumberCompact(user.data.warehouseCap)}
+                <span className={`flex items-center text-sm ${scoreCapStyle}`}>
+                  ({formatPercentage(scoreCapPercentage)})
+                </span>
+              </div>
             </div>
           </div>
         </>

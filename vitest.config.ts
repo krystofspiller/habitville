@@ -6,6 +6,8 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
+    globals: true,
+    include: ['**/*.test.tsx', '**/*.test.ts'],
   },
   resolve: {
     alias: [{ find: '~', replacement: resolve(__dirname, './src') }],

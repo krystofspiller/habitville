@@ -30,12 +30,26 @@ model PerformedAction {
 }
 
 model Building {
-    id          Int    @id @default(autoincrement())
-    createdBy   User   @relation(fields: [createdById], references: [id])
+    id          Int          @id @default(autoincrement())
+    createdBy   User         @relation(fields: [createdById], references: [id])
     createdById String
-    type        Int
+    type        BuildingType
     quantity    Int
     level       Int
+}
+
+enum BuildingType {
+    TOWN_HALL
+    HOUSE
+    FARM
+    WAREHOUSE
+    // ACADEMY = 5,
+    // MARKET = 6,
+    // BAKERY = 7,
+    // BLACKSMITH = 8,
+    // WORKSHOP = 9,
+    // BREWERY = 10,
+    // TAVERN = 11,
 }
 
 // Necessary for Next auth

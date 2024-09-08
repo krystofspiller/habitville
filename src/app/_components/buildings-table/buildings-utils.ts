@@ -1,3 +1,4 @@
+import { BuildingType } from '@prisma/client'
 import {
   IconBuildingBank,
   IconBuildingWarehouse,
@@ -5,7 +6,6 @@ import {
   IconHome,
   type TablerIconsProps,
 } from '@tabler/icons-react'
-import { BuildingType } from '~/util/enums'
 
 const BUILDINGS: Record<
   BuildingType,
