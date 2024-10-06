@@ -18,6 +18,7 @@ import {
 import { BuildingsMenu } from '~/app/_components/buildings-table/buildings-menu'
 import { BUILDINGS } from '~/app/_components/buildings-table/buildings-utils'
 import { DomainValue } from '~/app/_components/domain-value/domain-value'
+import { NotApplicable } from '~/app/_components/typography/not-applicable'
 import { type EnhancedBuilding } from '~/server/app/models/building'
 
 export function BuildingsTable({
@@ -30,7 +31,7 @@ export function BuildingsTable({
 
     const name =
       building.quantity > 1
-        ? `${building.quantity} ${buildingName}s`
+        ? `${buildingName} x ${building.quantity}`
         : buildingName
 
     return (
@@ -48,19 +49,19 @@ export function BuildingsTable({
               label={building.upgradeInfo}
               className="text-zinc-100 bg-zinc-800"
             >
-              <span>N/A</span>
+              <NotApplicable />
             </Tooltip>
           ) : (
             <DomainValue value={building.upgradeCost} currency="RP" />
           )}
         </TableTd>
         <TableTd>
-          {building.buildCost < 0 ? (
+          {building.unbuildableReason ?? !building.buildCost ? (
             <Tooltip
-              label={building.buildInfo}
+              label={building.unbuildableReason}
               className="text-zinc-100 bg-zinc-800"
             >
-              <span>N/A</span>
+              <NotApplicable />
             </Tooltip>
           ) : (
             <DomainValue value={building.buildCost} currency="RP" />
@@ -70,7 +71,7 @@ export function BuildingsTable({
           <Tooltip
             label={
               <span>
-                Generates {building.scoreGeneration} score per hour at current
+                Generates {building.scorePerHour} score per hour at current
                 level.
               </span>
             }

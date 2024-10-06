@@ -4,7 +4,7 @@ const LOCALE = 'en-US'
 // we would need to have 4 digits as at this point 10000 units / 3600 seconds > 1. Every
 // order of magnitude we can decrease the digits by 1.
 function getFractionDigits(scorePerHour: number): number {
-  return Math.max(0, 4 - Math.floor(Math.log10(scorePerHour)))
+  return Math.max(0, Math.min(4, 4 - Math.floor(Math.log10(scorePerHour))))
 }
 
 function formatScore(value: number, scorePerHour: number): string {

@@ -1,14 +1,18 @@
+import { BuildingType } from '@prisma/client'
 import { test } from 'vitest'
+import { BUILDINGS } from '~/app/_components/buildings-table/buildings-utils'
 import {
   type EnhancedBuilding,
   getUserBuildings,
   getScoreGeneration,
   getWarehouseCap,
+  enhanceBuilding,
+  unbuiltBuilding,
+  getBuildCost,
+  getUpgradeCost,
+  getBuildingScoreGeneration,
 } from '~/server/app/models/building'
-import {
-  getMockTownHall,
-  getMockWarehouse,
-} from '~/server/app/models/test-data'
+import { getMockBuilding } from '~/server/app/models/test-data'
 import { buildForCases } from '~/util/test-util'
 
 type BuildingConfigurationKey =
@@ -24,20 +28,25 @@ const buildingConfigurations: Record<
   Array<EnhancedBuilding>
 > = {
   'no buildings': [],
-  'town hall': [getMockTownHall()],
-  'upgraded town hall': [getMockTownHall({ level: 10 })],
-  'town hall and one warehouse': [getMockTownHall(), getMockWarehouse()],
+  'town hall': [getMockBuilding(BuildingType.TOWN_HALL)],
+  'upgraded town hall': [
+    getMockBuilding(BuildingType.TOWN_HALL, { level: 10 }),
+  ],
+  'town hall and one warehouse': [
+    getMockBuilding(BuildingType.TOWN_HALL),
+    getMockBuilding(BuildingType.WAREHOUSE),
+  ],
   'town hall and one upgraded warehouse': [
-    getMockTownHall(),
-    getMockWarehouse({ level: 2 }),
+    getMockBuilding(BuildingType.TOWN_HALL),
+    getMockBuilding(BuildingType.WAREHOUSE, { level: 2 }),
   ],
   'town hall and multiple warehouses': [
-    getMockTownHall(),
-    getMockWarehouse({ quantity: 10 }),
+    getMockBuilding(BuildingType.TOWN_HALL),
+    getMockBuilding(BuildingType.WAREHOUSE, { quantity: 10 }),
   ],
   'upgraded town hall and multiple upgraded warehouses': [
-    getMockTownHall({ level: 10 }),
-    getMockWarehouse({ level: 3, quantity: 10 }),
+    getMockBuilding(BuildingType.TOWN_HALL, { level: 10 }),
+    getMockBuilding(BuildingType.WAREHOUSE, { level: 3, quantity: 10 }),
   ],
 }
 
@@ -45,91 +54,486 @@ export const aTest = test.extend<{
   buildings: Record<BuildingConfigurationKey, Array<EnhancedBuilding>>
 }>({
   buildings: async ({}, use) => {
-    await use(buildingConfigurations)
+    await use(
+      JSON.parse(JSON.stringify(buildingConfigurations)) as Record<
+        BuildingConfigurationKey,
+        Array<EnhancedBuilding>
+      >,
+    )
   },
 })
 
 describe('building model', () => {
-  describe('getScoreGeneration', () => {
-    aTest.for(
-      buildForCases(buildingConfigurations, [
-        {
-          breakdown: [],
-          scorePerHour: 0,
-        },
-        {
-          breakdown: [
-            {
-              name: 'town hall',
-              scorePerHour: 1,
-            },
+  describe('public interface', () => {
+    describe('getScoreGeneration', () => {
+      aTest.for(
+        buildForCases<
+          BuildingConfigurationKey,
+          ReturnType<typeof getScoreGeneration>
+        >({
+          'no buildings': {
+            breakdown: [],
+            scorePerHour: 0,
+          },
+          'town hall': {
+            breakdown: [
+              {
+                name: 'town hall',
+                scorePerHour: 1,
+              },
+            ],
+            scorePerHour: 1,
+          },
+          'upgraded town hall': {
+            breakdown: [
+              {
+                name: 'town hall',
+                scorePerHour: 1,
+              },
+            ],
+            scorePerHour: 1,
+          },
+          'town hall and one warehouse': {
+            breakdown: [
+              {
+                name: 'town hall',
+                scorePerHour: 1,
+              },
+            ],
+            scorePerHour: 1,
+          },
+          'town hall and one upgraded warehouse': {
+            breakdown: [
+              {
+                name: 'town hall',
+                scorePerHour: 1,
+              },
+            ],
+            scorePerHour: 1,
+          },
+          'town hall and multiple warehouses': {
+            breakdown: [
+              {
+                name: 'town hall',
+                scorePerHour: 1,
+              },
+            ],
+            scorePerHour: 1,
+          },
+          'upgraded town hall and multiple upgraded warehouses': {
+            breakdown: [
+              {
+                name: 'town hall',
+                scorePerHour: 1,
+              },
+            ],
+            scorePerHour: 1,
+          },
+        }),
+      )('when %s', ([testName, expected], { buildings }) => {
+        expect(getScoreGeneration(buildings[testName])).toEqual(expected)
+      })
+    })
+
+    describe('getUserBuildings', () => {
+      aTest.for(
+        buildForCases<
+          BuildingConfigurationKey,
+          ReturnType<typeof getUserBuildings>
+        >({
+          'no buildings': [
+            getMockBuilding(BuildingType.TOWN_HALL, { unbuilt: true }),
           ],
-          scorePerHour: 1,
-        },
-        {
-          breakdown: [
-            {
-              name: 'town hall',
-              scorePerHour: 1,
-            },
+          'town hall': [
+            getMockBuilding(BuildingType.TOWN_HALL),
+            getMockBuilding(BuildingType.HOUSE, { unbuilt: true }),
+            getMockBuilding(BuildingType.FARM, { unbuilt: true }),
+            getMockBuilding(BuildingType.WAREHOUSE, { unbuilt: true }),
           ],
-          scorePerHour: 1,
-        },
-        {
-          breakdown: [
-            {
-              name: 'town hall',
-              scorePerHour: 1,
-            },
+          'upgraded town hall': [
+            getMockBuilding(BuildingType.TOWN_HALL, {
+              level: buildingConfigurations['upgraded town hall'][0]!.level,
+            }),
+            getMockBuilding(BuildingType.HOUSE, { unbuilt: true }),
+            getMockBuilding(BuildingType.FARM, { unbuilt: true }),
+            getMockBuilding(BuildingType.WAREHOUSE, { unbuilt: true }),
           ],
-          scorePerHour: 1,
-        },
-        {
-          breakdown: [
-            {
-              name: 'town hall',
-              scorePerHour: 1,
-            },
+          'town hall and one warehouse': [
+            getMockBuilding(BuildingType.TOWN_HALL),
+            getMockBuilding(BuildingType.WAREHOUSE),
+            getMockBuilding(BuildingType.HOUSE, { unbuilt: true }),
+            getMockBuilding(BuildingType.FARM, { unbuilt: true }),
           ],
-          scorePerHour: 1,
-        },
-        {
-          breakdown: [
-            {
-              name: 'town hall',
-              scorePerHour: 1,
-            },
+          'town hall and one upgraded warehouse': [
+            getMockBuilding(BuildingType.TOWN_HALL),
+            getMockBuilding(BuildingType.WAREHOUSE, {
+              level:
+                buildingConfigurations[
+                  'town hall and one upgraded warehouse'
+                ][1]!.level,
+            }),
+            getMockBuilding(BuildingType.HOUSE, { unbuilt: true }),
+            getMockBuilding(BuildingType.FARM, { unbuilt: true }),
           ],
-          scorePerHour: 1,
-        },
-        {
-          breakdown: [
-            {
-              name: 'town hall',
-              scorePerHour: 1,
-            },
+          'town hall and multiple warehouses': [
+            getMockBuilding(BuildingType.TOWN_HALL),
+            getMockBuilding(BuildingType.WAREHOUSE, {
+              quantity:
+                buildingConfigurations['town hall and multiple warehouses'][1]!
+                  .quantity,
+            }),
+            getMockBuilding(BuildingType.HOUSE, { unbuilt: true }),
+            getMockBuilding(BuildingType.FARM, { unbuilt: true }),
           ],
-          scorePerHour: 1,
-        },
-      ]),
-    )('when %s', ([testName, expected], { buildings }) => {
-      expect(getScoreGeneration(buildings[testName])).toEqual(expected)
+          'upgraded town hall and multiple upgraded warehouses': [
+            getMockBuilding(BuildingType.TOWN_HALL, {
+              level:
+                buildingConfigurations[
+                  'upgraded town hall and multiple upgraded warehouses'
+                ][0]!.level,
+            }),
+            getMockBuilding(BuildingType.WAREHOUSE, {
+              level:
+                buildingConfigurations[
+                  'upgraded town hall and multiple upgraded warehouses'
+                ][1]!.level,
+              quantity:
+                buildingConfigurations[
+                  'upgraded town hall and multiple upgraded warehouses'
+                ][1]!.quantity,
+            }),
+            getMockBuilding(BuildingType.HOUSE, { unbuilt: true }),
+            getMockBuilding(BuildingType.FARM, { unbuilt: true }),
+          ],
+        }),
+      )('when %s', ([testName, expectedCap], { buildings }) => {
+        expect(getUserBuildings(buildings[testName])).toEqual(expectedCap)
+      })
+    })
+
+    describe('getWarehouseCap', () => {
+      aTest.for(
+        buildForCases<
+          BuildingConfigurationKey,
+          ReturnType<typeof getWarehouseCap>
+        >({
+          'no buildings': 0,
+          'town hall': 10,
+          'upgraded town hall': 10,
+          'town hall and one warehouse': 110,
+          'town hall and one upgraded warehouse': 160,
+          'town hall and multiple warehouses': 1010,
+          'upgraded town hall and multiple upgraded warehouses': 2260,
+        }),
+      )('when %s', ([testName, expectedCap], { buildings }) => {
+        expect(getWarehouseCap(buildings[testName])).toEqual(expectedCap)
+      })
     })
   })
 
-  describe.only('getUserBuildings', () => {
-    aTest.for(
-      buildForCases(buildingConfigurations, [{}, {}, {}, {}, {}, {}, {}]),
-    )('when %s', ([testName, expectedCap], { buildings }) => {
-      expect(getUserBuildings(buildings[testName])).toEqual(expectedCap)
-    })
-  })
+  describe('private interface', () => {
+    describe('enhanceBuilding', () => {
+      test('should return an enhanced building', () => {
+        const building = getMockBuilding(BuildingType.TOWN_HALL, {
+          skipEnhance: true,
+        })
+        expect(enhanceBuilding(building, [building])).toEqual({
+          ...building,
+          unbuildableReason: 'Town hall already built',
+          upgradeCost: -1,
+          upgradeInfo: 'Upgrade not implemented',
+          scorePerHour: 1,
+        })
+      })
 
-  describe('getWarehouseCap', () => {
-    aTest.for(
-      buildForCases(buildingConfigurations, [0, 10, 10, 110, 160, 1010, 2260]),
-    )('when %s', ([testName, expectedCap], { buildings }) => {
-      expect(getWarehouseCap(buildings[testName])).toEqual(expectedCap)
+      test.each(
+        Object.values(BuildingType).map((type) => {
+          return [BUILDINGS[type].name, type]
+        }),
+      )(`should return an unbuilt building for %s`, (_, type) => {
+        expect(unbuiltBuilding(type)).toEqual({
+          id: -1,
+          createdById: '-1',
+          type,
+          quantity: 0,
+          level: 0,
+        })
+      })
+    })
+
+    describe('getBuildCost', () => {
+      const b = getMockBuilding(BuildingType.HOUSE, {
+        quantity: 2,
+        skipEnhance: true,
+      })
+
+      test.each([
+        [
+          '0 town halls',
+          getMockBuilding<true>(BuildingType.TOWN_HALL, {
+            unbuilt: true,
+            skipEnhance: true,
+          } as const),
+          [],
+          { buildCost: 10 },
+        ] as const,
+        [
+          '1 town hall',
+          getMockBuilding(BuildingType.TOWN_HALL, {
+            quantity: 1,
+            skipEnhance: true,
+          }),
+          [],
+          { unbuildableReason: 'Town hall already built' },
+        ],
+        [
+          '0 houses',
+          getMockBuilding(BuildingType.HOUSE, {
+            unbuilt: true,
+            skipEnhance: true,
+          }),
+          [],
+          { buildCost: 10 },
+        ],
+        [
+          '1 house',
+          getMockBuilding(BuildingType.HOUSE, {
+            quantity: 1,
+            skipEnhance: true,
+          }),
+          [],
+          { buildCost: 13 },
+        ],
+        [
+          '2 houses',
+          getMockBuilding(BuildingType.HOUSE, {
+            quantity: 2,
+            skipEnhance: true,
+          }),
+          [],
+          { buildCost: 17 },
+        ],
+        [
+          '10 houses',
+          getMockBuilding(BuildingType.HOUSE, {
+            quantity: 10,
+            skipEnhance: true,
+          }),
+          [],
+          { buildCost: 138 },
+        ],
+        [
+          '0 farms and 0 houses',
+          getMockBuilding(BuildingType.FARM, {
+            unbuilt: true,
+            skipEnhance: true,
+          }),
+          [
+            getMockBuilding(BuildingType.HOUSE, {
+              unbuilt: true,
+              skipEnhance: true,
+            }),
+          ],
+          { unbuildableReason: 'Build a house' },
+        ],
+        [
+          '0 farms and 1 house',
+          getMockBuilding(BuildingType.FARM, {
+            unbuilt: true,
+            skipEnhance: true,
+          }),
+          [
+            getMockBuilding(BuildingType.HOUSE, {
+              quantity: 1,
+              skipEnhance: true,
+            }),
+          ],
+          { buildCost: 20 },
+        ],
+        [
+          '1 farm and 3 houses',
+          getMockBuilding(BuildingType.FARM, {
+            quantity: 1,
+            skipEnhance: true,
+          }),
+          [
+            getMockBuilding(BuildingType.HOUSE, {
+              quantity: 3,
+              skipEnhance: true,
+            }),
+          ],
+          { unbuildableReason: 'Build a house' },
+        ],
+        [
+          '1 farm and 4 houses',
+          getMockBuilding(BuildingType.FARM, {
+            quantity: 1,
+            skipEnhance: true,
+          }),
+          [
+            getMockBuilding(BuildingType.HOUSE, {
+              quantity: 4,
+              skipEnhance: true,
+            }),
+          ],
+          { buildCost: 46 },
+        ],
+        [
+          '3 farms and 9 houses',
+          getMockBuilding(BuildingType.FARM, {
+            quantity: 3,
+            skipEnhance: true,
+          }),
+          [
+            getMockBuilding(BuildingType.HOUSE, {
+              quantity: 9,
+              skipEnhance: true,
+            }),
+          ],
+          { unbuildableReason: 'Build a house' },
+        ],
+        [
+          '3 farms and 10 houses',
+          getMockBuilding(BuildingType.FARM, {
+            quantity: 3,
+            skipEnhance: true,
+          }),
+          [
+            getMockBuilding(BuildingType.HOUSE, {
+              quantity: 10,
+              skipEnhance: true,
+            }),
+          ],
+          { buildCost: 243 },
+        ],
+        [
+          '0 warehouses',
+          getMockBuilding(BuildingType.WAREHOUSE, {
+            unbuilt: true,
+            skipEnhance: true,
+          }),
+          [],
+          { buildCost: 15 },
+        ],
+        [
+          '1 warehouse',
+          getMockBuilding(BuildingType.WAREHOUSE, {
+            quantity: 1,
+            skipEnhance: true,
+          }),
+          [],
+          { buildCost: 30 },
+        ],
+        [
+          '3 warehouses',
+          getMockBuilding(BuildingType.WAREHOUSE, {
+            quantity: 3,
+            skipEnhance: true,
+          }),
+          [],
+          { buildCost: 120 },
+        ],
+      ])('%s', (_, building, otherBuildings, expected) => {
+        expect(getBuildCost(building, [...otherBuildings, building])).toEqual(
+          expected,
+        )
+      })
+    })
+
+    describe('getUpgradeCost', () => {
+      test('not implemented', () => {
+        expect(getUpgradeCost()).toEqual({
+          upgradeCost: -1,
+          upgradeInfo: 'Upgrade not implemented',
+        })
+      })
+    })
+
+    describe('getBuildingScoreGeneration', () => {
+      test.each([
+        [
+          '0 town halls',
+          getMockBuilding(BuildingType.TOWN_HALL, {
+            unbuilt: true,
+            skipEnhance: true,
+          }),
+          { scorePerHour: 0 },
+        ],
+        [
+          '1 town hall',
+          getMockBuilding(BuildingType.TOWN_HALL, {
+            quantity: 1,
+            skipEnhance: true,
+          }),
+          { scorePerHour: 1 },
+        ],
+        [
+          '0 houses',
+          getMockBuilding(BuildingType.HOUSE, {
+            unbuilt: true,
+            skipEnhance: true,
+          }),
+          { scorePerHour: 0 },
+        ],
+        [
+          '1 house',
+          getMockBuilding(BuildingType.HOUSE, {
+            quantity: 1,
+            skipEnhance: true,
+          }),
+          { scorePerHour: 1 },
+        ],
+        [
+          '10 houses',
+          getMockBuilding(BuildingType.HOUSE, {
+            quantity: 10,
+            skipEnhance: true,
+          }),
+          { scorePerHour: 10 },
+        ],
+        [
+          '0 farms',
+          getMockBuilding(BuildingType.FARM, {
+            unbuilt: true,
+            skipEnhance: true,
+          }),
+          { scorePerHour: 0 },
+        ],
+        [
+          '1 farm',
+          getMockBuilding(BuildingType.FARM, {
+            quantity: 1,
+            skipEnhance: true,
+          }),
+          { scorePerHour: 5 },
+        ],
+        [
+          '3 farms',
+          getMockBuilding(BuildingType.FARM, {
+            quantity: 3,
+            skipEnhance: true,
+          }),
+          { scorePerHour: 15 },
+        ],
+        [
+          '0 warehouses',
+          getMockBuilding(BuildingType.WAREHOUSE, {
+            unbuilt: true,
+            skipEnhance: true,
+          }),
+          { scorePerHour: 0 },
+        ],
+        [
+          '10 warehouses',
+          getMockBuilding(BuildingType.WAREHOUSE, {
+            quantity: 10,
+            skipEnhance: true,
+          }),
+          { scorePerHour: 0 },
+        ],
+      ])('%s', (_, building, expected) => {
+        expect(getBuildingScoreGeneration(building)).toEqual(expected)
+      })
     })
   })
 })

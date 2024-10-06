@@ -1,43 +1,58 @@
-import { BuildingType, type Building } from '@prisma/client'
-import { _enhanceBuilding } from '~/server/app/models/building'
+import { type BuildingType, type Building } from '@prisma/client'
+import {
+  enhanceBuilding,
+  type EnhancedBuilding,
+  unbuiltBuilding,
+} from '~/server/app/models/building'
 
-const MOCK_TOWN_HALL: Building = {
+const MOCK_BASE_BUILDING = (type: BuildingType): Building => ({
   id: 1,
   createdById: '1',
-  type: BuildingType.TOWN_HALL,
+  type,
   level: 1,
   quantity: 1,
+})
+
+type GetMockBuildingOptions<T extends true | false> = Partial<
+  Exclude<EnhancedBuilding, 'id' | 'createdById' | 'type'>
+> & {
+  skipEnhance?: T
+  unbuilt?: true
 }
 
-const MOCK_WAREHOUSE: Building = {
-  id: 1,
-  createdById: '1',
-  type: BuildingType.WAREHOUSE,
-  level: 1,
-  quantity: 1,
-}
-
-function getMockTownHall({ level = 1 }: { level?: number } = {}) {
-  const building = {
-    ...MOCK_TOWN_HALL,
-    level,
+function getMockBuilding<
+  T extends true | false,
+  R = T extends true ? Building : EnhancedBuilding,
+>(
+  buildingType: BuildingType,
+  options: GetMockBuildingOptions<T> = { skipEnhance: false as T },
+): R {
+  if (options?.unbuilt) {
+    const unbuilt = unbuiltBuilding(buildingType)
+    return (
+      options.skipEnhance ? unbuilt : enhanceBuilding(unbuilt, [unbuilt])
+    ) as R
   }
-  return _enhanceBuilding(building, [building])
-}
 
-function getMockWarehouse({
-  level = 1,
-  quantity = 1,
-}: {
-  level?: number
-  quantity?: number
-} = {}) {
-  const building = {
-    ...MOCK_WAREHOUSE,
-    level,
-    quantity,
+  if ((options?.quantity ?? 1) <= 0) {
+    throw new Error('Quantity must be positive, use unbuilt option instead')
   }
-  return _enhanceBuilding(building, [building])
+
+  if ((options?.level ?? 1) <= 0) {
+    throw new Error('Level must be positive')
+  }
+
+  const building = {
+    ...MOCK_BASE_BUILDING(buildingType),
+    ...options,
+  }
+
+  delete building.unbuilt
+  delete building.skipEnhance
+
+  return (
+    options.skipEnhance ? building : enhanceBuilding(building, [building])
+  ) as R
 }
 
-export { getMockTownHall, getMockWarehouse }
+export { getMockBuilding }

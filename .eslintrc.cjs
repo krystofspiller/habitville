@@ -13,9 +13,9 @@ const config = {
   rules: {
     // Custom
     semi: ['error', 'never'],
+    '@typescript-eslint/no-unsafe-assignment': 'warn',
 
-    // These opinionated rules are enabled in stylistic-type-checked above.
-    // Feel free to reconfigure them to your own preference.
+    // T3 defaults
     '@typescript-eslint/array-type': 'off',
     '@typescript-eslint/consistent-type-definitions': 'off',
 

@@ -1,12 +1,14 @@
 import { BuildingType, type Building } from '@prisma/client'
 import { BUILDINGS } from '~/app/_components/buildings-table/buildings-utils'
 
-type BuildCostAndInfo = { buildCost: number; buildInfo?: string }
+type BuildCost =
+  | { buildCost: number; unbuildableReason?: never }
+  | { buildCost?: never; unbuildableReason: string }
 type UpgradeCostAndInfo = { upgradeCost: number; upgradeInfo?: string }
-type EnhancedBuilding = Omit<Building, 'type'> & {
-  type: BuildingType
-  scoreGeneration: number
-} & BuildCostAndInfo &
+type ScoreGeneration = { scorePerHour: number }
+type EnhancedBuilding = Building &
+  ScoreGeneration &
+  BuildCost &
   UpgradeCostAndInfo
 
 const unbuiltBuilding = (buildingType: BuildingType): Building => ({
@@ -17,7 +19,7 @@ const unbuiltBuilding = (buildingType: BuildingType): Building => ({
   level: 0,
 })
 
-function _enhanceBuilding(
+function enhanceBuilding(
   building: Building,
   buildings: Array<Building>,
 ): EnhancedBuilding {
@@ -30,41 +32,54 @@ function _enhanceBuilding(
 }
 
 function getUserBuildings(buildings: Array<Building>): Array<EnhancedBuilding> {
-  let isTownHallBuilt = true
-  if (buildings.length === 0) {
+  const builtBuildings = buildings.reduce((acc, building) => {
+    acc.push(building.type)
+    return acc
+  }, [] as Array<BuildingType>)
+
+  if (!builtBuildings.includes(BuildingType.TOWN_HALL)) {
     buildings.push(unbuiltBuilding(BuildingType.TOWN_HALL))
-    isTownHallBuilt = false
   }
 
-  if (buildings.length === 1 && isTownHallBuilt) {
-    buildings.push(unbuiltBuilding(BuildingType.HOUSE))
-    buildings.push(unbuiltBuilding(BuildingType.FARM))
-    buildings.push(unbuiltBuilding(BuildingType.WAREHOUSE))
+  if (builtBuildings.includes(BuildingType.TOWN_HALL)) {
+    if (!builtBuildings.includes(BuildingType.HOUSE)) {
+      buildings.push(unbuiltBuilding(BuildingType.HOUSE))
+    }
+    if (!builtBuildings.includes(BuildingType.FARM)) {
+      buildings.push(unbuiltBuilding(BuildingType.FARM))
+    }
+    if (!builtBuildings.includes(BuildingType.WAREHOUSE)) {
+      buildings.push(unbuiltBuilding(BuildingType.WAREHOUSE))
+    }
   }
 
-  return buildings.map((building) => _enhanceBuilding(building, buildings))
+  return buildings.map((building) => enhanceBuilding(building, buildings))
 }
 
 function getBuildCost(
   building: Building,
   buildings: Array<Building>,
-): BuildCostAndInfo {
+): BuildCost {
   switch (building.type) {
     case BuildingType.TOWN_HALL:
       return building.quantity === 0
         ? { buildCost: 10 }
-        : { buildCost: -1, buildInfo: 'Town hall already built' }
+        : { unbuildableReason: 'Town hall already built' }
     case BuildingType.HOUSE:
-      return { buildCost: Math.pow(1.25, building.quantity) * 100 }
+      return {
+        buildCost: Math.round(Math.pow(1.3, building.quantity) * 10),
+      }
     case BuildingType.FARM:
       return (buildings.find((building) => building.type === BuildingType.HOUSE)
-        ?.quantity ?? -1) > building.quantity
-        ? { buildCost: Math.pow(1.3, building.quantity) * 100 }
-        : { buildCost: -1, buildInfo: 'Build more houses' }
+        ?.quantity ?? -1) >
+        building.quantity * 3
+        ? { buildCost: Math.round(Math.pow(2, building.quantity * 1.2) * 20) }
+        : { unbuildableReason: 'Build a house' }
     case BuildingType.WAREHOUSE:
-      return { buildCost: Math.pow(1.5, building.quantity) * 150 }
+      return { buildCost: Math.round(Math.pow(2, building.quantity) * 15) }
     default:
-      return { buildCost: -1 }
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      throw new Error(`Unexpected type ${building.type}`)
   }
 }
 
@@ -72,19 +87,17 @@ function getUpgradeCost(): UpgradeCostAndInfo {
   return { upgradeCost: -1, upgradeInfo: 'Upgrade not implemented' }
 }
 
-function getBuildingScoreGeneration(building: Building): {
-  scoreGeneration: number
-} {
+function getBuildingScoreGeneration(building: Building): ScoreGeneration {
   if (building.type === BuildingType.WAREHOUSE) {
-    return { scoreGeneration: 0 }
+    return { scorePerHour: 0 }
   }
 
   const quantityFactor = building.quantity
   if (building.type === BuildingType.FARM) {
-    return { scoreGeneration: 5 * quantityFactor }
+    return { scorePerHour: 5 * quantityFactor }
   }
 
-  return { scoreGeneration: 1 * quantityFactor }
+  return { scorePerHour: 1 * quantityFactor }
 }
 
 function getScoreGeneration(buildings: Array<EnhancedBuilding>) {
@@ -96,10 +109,10 @@ function getScoreGeneration(buildings: Array<EnhancedBuilding>) {
       }
 
       acc.breakdown.push({
-        scorePerHour: building.scoreGeneration,
+        scorePerHour: building.scorePerHour,
         name: `${BUILDINGS[building.type].name.toLowerCase()}${building.quantity > 1 ? 's' : ''}`,
       })
-      acc.scorePerHour += building.scoreGeneration
+      acc.scorePerHour += building.scorePerHour
 
       return acc
     },
@@ -123,7 +136,11 @@ function getWarehouseCap(buildings: Array<Building>): number {
 }
 
 export {
-  _enhanceBuilding,
+  enhanceBuilding,
+  unbuiltBuilding,
+  getBuildCost,
+  getUpgradeCost,
+  getBuildingScoreGeneration,
   getScoreGeneration,
   getUserBuildings,
   getWarehouseCap,
