@@ -56,7 +56,7 @@ export function BuildingsMenu({ building }: { building: EnhancedBuilding }) {
       </Menu.Target>
 
       <Menu.Dropdown>
-        {building.buildCost > 0 && (
+        {building.buildCost && building.buildCost > 0 && (
           <Menu.Item
             onClick={() => {
               createBuilding.mutate({ type: building.type })

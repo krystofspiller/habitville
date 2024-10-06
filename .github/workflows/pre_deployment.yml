@@ -1,0 +1,25 @@
+name: Pre-deployment checks
+
+on:
+  pull_request:
+    branches:
+      - '**'
+  push:
+    branches:
+      - main
+
+jobs:
+  tests:
+    name: Run tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: bun run test:ci
+      - run: bun run lint:ci
+      - run: bun run build:ci

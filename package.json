@@ -5,13 +5,16 @@
   "type": "module",
   "scripts": {
     "build": "next build",
+    "build:ci": "SKIP_ENV_VALIDATION=true next build",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "dev": "next dev",
     "lint": "next lint",
+    "lint:ci": "SKIP_ENV_VALIDATION=true next lint",
     "postinstall": "prisma generate",
     "start": "next start",
-    "test": "vitest"
+    "test": "vitest",
+    "test:ci": "vitest --run"
   },
   "dependencies": {
     "@mantine/core": "^7.5.3",

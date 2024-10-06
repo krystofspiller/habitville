@@ -262,24 +262,19 @@ describe('building model', () => {
     })
 
     describe('getBuildCost', () => {
-      const b = getMockBuilding(BuildingType.HOUSE, {
-        quantity: 2,
-        skipEnhance: true,
-      })
-
       test.each([
         [
           '0 town halls',
           getMockBuilding<true>(BuildingType.TOWN_HALL, {
             unbuilt: true,
             skipEnhance: true,
-          } as const),
+          }),
           [],
           { buildCost: 10 },
         ] as const,
         [
           '1 town hall',
-          getMockBuilding(BuildingType.TOWN_HALL, {
+          getMockBuilding<true>(BuildingType.TOWN_HALL, {
             quantity: 1,
             skipEnhance: true,
           }),
@@ -288,7 +283,7 @@ describe('building model', () => {
         ],
         [
           '0 houses',
-          getMockBuilding(BuildingType.HOUSE, {
+          getMockBuilding<true>(BuildingType.HOUSE, {
             unbuilt: true,
             skipEnhance: true,
           }),
@@ -297,7 +292,7 @@ describe('building model', () => {
         ],
         [
           '1 house',
-          getMockBuilding(BuildingType.HOUSE, {
+          getMockBuilding<true>(BuildingType.HOUSE, {
             quantity: 1,
             skipEnhance: true,
           }),
@@ -306,7 +301,7 @@ describe('building model', () => {
         ],
         [
           '2 houses',
-          getMockBuilding(BuildingType.HOUSE, {
+          getMockBuilding<true>(BuildingType.HOUSE, {
             quantity: 2,
             skipEnhance: true,
           }),
@@ -315,7 +310,7 @@ describe('building model', () => {
         ],
         [
           '10 houses',
-          getMockBuilding(BuildingType.HOUSE, {
+          getMockBuilding<true>(BuildingType.HOUSE, {
             quantity: 10,
             skipEnhance: true,
           }),
@@ -324,12 +319,12 @@ describe('building model', () => {
         ],
         [
           '0 farms and 0 houses',
-          getMockBuilding(BuildingType.FARM, {
+          getMockBuilding<true>(BuildingType.FARM, {
             unbuilt: true,
             skipEnhance: true,
           }),
           [
-            getMockBuilding(BuildingType.HOUSE, {
+            getMockBuilding<true>(BuildingType.HOUSE, {
               unbuilt: true,
               skipEnhance: true,
             }),
@@ -338,12 +333,12 @@ describe('building model', () => {
         ],
         [
           '0 farms and 1 house',
-          getMockBuilding(BuildingType.FARM, {
+          getMockBuilding<true>(BuildingType.FARM, {
             unbuilt: true,
             skipEnhance: true,
           }),
           [
-            getMockBuilding(BuildingType.HOUSE, {
+            getMockBuilding<true>(BuildingType.HOUSE, {
               quantity: 1,
               skipEnhance: true,
             }),
@@ -352,12 +347,12 @@ describe('building model', () => {
         ],
         [
           '1 farm and 3 houses',
-          getMockBuilding(BuildingType.FARM, {
+          getMockBuilding<true>(BuildingType.FARM, {
             quantity: 1,
             skipEnhance: true,
           }),
           [
-            getMockBuilding(BuildingType.HOUSE, {
+            getMockBuilding<true>(BuildingType.HOUSE, {
               quantity: 3,
               skipEnhance: true,
             }),
@@ -366,12 +361,12 @@ describe('building model', () => {
         ],
         [
           '1 farm and 4 houses',
-          getMockBuilding(BuildingType.FARM, {
+          getMockBuilding<true>(BuildingType.FARM, {
             quantity: 1,
             skipEnhance: true,
           }),
           [
-            getMockBuilding(BuildingType.HOUSE, {
+            getMockBuilding<true>(BuildingType.HOUSE, {
               quantity: 4,
               skipEnhance: true,
             }),
@@ -380,12 +375,12 @@ describe('building model', () => {
         ],
         [
           '3 farms and 9 houses',
-          getMockBuilding(BuildingType.FARM, {
+          getMockBuilding<true>(BuildingType.FARM, {
             quantity: 3,
             skipEnhance: true,
           }),
           [
-            getMockBuilding(BuildingType.HOUSE, {
+            getMockBuilding<true>(BuildingType.HOUSE, {
               quantity: 9,
               skipEnhance: true,
             }),
@@ -394,12 +389,12 @@ describe('building model', () => {
         ],
         [
           '3 farms and 10 houses',
-          getMockBuilding(BuildingType.FARM, {
+          getMockBuilding<true>(BuildingType.FARM, {
             quantity: 3,
             skipEnhance: true,
           }),
           [
-            getMockBuilding(BuildingType.HOUSE, {
+            getMockBuilding<true>(BuildingType.HOUSE, {
               quantity: 10,
               skipEnhance: true,
             }),
@@ -408,7 +403,7 @@ describe('building model', () => {
         ],
         [
           '0 warehouses',
-          getMockBuilding(BuildingType.WAREHOUSE, {
+          getMockBuilding<true>(BuildingType.WAREHOUSE, {
             unbuilt: true,
             skipEnhance: true,
           }),
@@ -417,7 +412,7 @@ describe('building model', () => {
         ],
         [
           '1 warehouse',
-          getMockBuilding(BuildingType.WAREHOUSE, {
+          getMockBuilding<true>(BuildingType.WAREHOUSE, {
             quantity: 1,
             skipEnhance: true,
           }),
@@ -426,7 +421,7 @@ describe('building model', () => {
         ],
         [
           '3 warehouses',
-          getMockBuilding(BuildingType.WAREHOUSE, {
+          getMockBuilding<true>(BuildingType.WAREHOUSE, {
             quantity: 3,
             skipEnhance: true,
           }),
@@ -453,7 +448,7 @@ describe('building model', () => {
       test.each([
         [
           '0 town halls',
-          getMockBuilding(BuildingType.TOWN_HALL, {
+          getMockBuilding<true>(BuildingType.TOWN_HALL, {
             unbuilt: true,
             skipEnhance: true,
           }),
@@ -461,7 +456,7 @@ describe('building model', () => {
         ],
         [
           '1 town hall',
-          getMockBuilding(BuildingType.TOWN_HALL, {
+          getMockBuilding<true>(BuildingType.TOWN_HALL, {
             quantity: 1,
             skipEnhance: true,
           }),
@@ -469,7 +464,7 @@ describe('building model', () => {
         ],
         [
           '0 houses',
-          getMockBuilding(BuildingType.HOUSE, {
+          getMockBuilding<true>(BuildingType.HOUSE, {
             unbuilt: true,
             skipEnhance: true,
           }),
@@ -477,7 +472,7 @@ describe('building model', () => {
         ],
         [
           '1 house',
-          getMockBuilding(BuildingType.HOUSE, {
+          getMockBuilding<true>(BuildingType.HOUSE, {
             quantity: 1,
             skipEnhance: true,
           }),
@@ -485,7 +480,7 @@ describe('building model', () => {
         ],
         [
           '10 houses',
-          getMockBuilding(BuildingType.HOUSE, {
+          getMockBuilding<true>(BuildingType.HOUSE, {
             quantity: 10,
             skipEnhance: true,
           }),
@@ -493,7 +488,7 @@ describe('building model', () => {
         ],
         [
           '0 farms',
-          getMockBuilding(BuildingType.FARM, {
+          getMockBuilding<true>(BuildingType.FARM, {
             unbuilt: true,
             skipEnhance: true,
           }),
@@ -501,7 +496,7 @@ describe('building model', () => {
         ],
         [
           '1 farm',
-          getMockBuilding(BuildingType.FARM, {
+          getMockBuilding<true>(BuildingType.FARM, {
             quantity: 1,
             skipEnhance: true,
           }),
@@ -509,7 +504,7 @@ describe('building model', () => {
         ],
         [
           '3 farms',
-          getMockBuilding(BuildingType.FARM, {
+          getMockBuilding<true>(BuildingType.FARM, {
             quantity: 3,
             skipEnhance: true,
           }),
@@ -517,7 +512,7 @@ describe('building model', () => {
         ],
         [
           '0 warehouses',
-          getMockBuilding(BuildingType.WAREHOUSE, {
+          getMockBuilding<true>(BuildingType.WAREHOUSE, {
             unbuilt: true,
             skipEnhance: true,
           }),
@@ -525,7 +520,7 @@ describe('building model', () => {
         ],
         [
           '10 warehouses',
-          getMockBuilding(BuildingType.WAREHOUSE, {
+          getMockBuilding<true>(BuildingType.WAREHOUSE, {
             quantity: 10,
             skipEnhance: true,
           }),
