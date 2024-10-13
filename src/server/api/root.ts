@@ -1,7 +1,7 @@
 import { actionRouter } from '~/server/api/routers/action'
 import { buildingRouter } from '~/server/api/routers/building'
 import { userRouter } from '~/server/api/routers/user'
-import { createTRPCRouter } from '~/server/api/trpc'
+import { createCallerFactory, createTRPCRouter } from '~/server/api/trpc'
 import { type inferRouterOutputs } from '@trpc/server'
 
 /**
@@ -17,6 +17,15 @@ export const appRouter = createTRPCRouter({
 
 // export type definition of API
 export type AppRouter = typeof appRouter
+
+/**
+ * Create a server-side caller for the tRPC API.
+ * @example
+ * const trpc = createCaller(createContext);
+ * const res = await trpc.post.all();
+ *       ^? Post[]
+ */
+export const createCaller = createCallerFactory(appRouter)
 
 // type RouterInput = inferRouterInputs<ActionRouter>
 type RouterOutput = inferRouterOutputs<AppRouter>

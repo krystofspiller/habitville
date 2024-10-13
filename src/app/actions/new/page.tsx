@@ -23,7 +23,7 @@ export default function Page() {
     },
   })
 
-  const isLoading = createAction.isLoading
+  const isLoading = createAction.isPending
 
   const form = useForm({
     initialValues: {
