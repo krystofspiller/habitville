@@ -4,12 +4,13 @@ import {
   IconBuildingWarehouse,
   IconGrowth,
   IconHome,
-  type TablerIconsProps,
+  type IconProps,
 } from '@tabler/icons-react'
+import { type ReactNode } from 'react'
 
 const BUILDINGS: Record<
   BuildingType,
-  { name: string; icon: (props: TablerIconsProps) => JSX.Element }
+  { name: string; icon: (props: IconProps) => ReactNode }
 > = {
   [BuildingType.TOWN_HALL]: {
     name: 'Town hall',
