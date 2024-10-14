@@ -8,10 +8,14 @@ import {
 import { getCollectScoreInfo } from '~/server/app/models/user'
 import { getLevel } from '~/util/level'
 
-async function getUser(userId: string, db: PrismaClient) {
-  const user = await db.user.findFirst({
+export async function fetchUser(userId: string, db: PrismaClient) {
+  return db.user.findFirst({
     where: { id: userId },
   })
+}
+
+async function getUser(userId: string, db: PrismaClient) {
+  const user = await fetchUser(userId, db)
 
   if (!user) {
     return null
@@ -38,12 +42,12 @@ export const userRouter = createTRPCRouter({
   collectScore: protectedProcedure.mutation(async ({ ctx }) => {
     const requestTime = new Date()
 
-    const buildings = await getBuildings(ctx.session.user.id, ctx.db)
     const user = await getUser(ctx.session.user.id, ctx.db)
-
     if (!user) {
       return null
     }
+
+    const buildings = await getBuildings(user, ctx.db)
 
     const { scorePerHour } = getScoreGeneration(buildings)
     const { accumulatedScore, collectedAt } = getCollectScoreInfo(

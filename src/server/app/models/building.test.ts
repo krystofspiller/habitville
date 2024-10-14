@@ -12,7 +12,7 @@ import {
   getUpgradeCost,
   getBuildingScoreGeneration,
 } from '~/server/app/models/building'
-import { getMockBuilding } from '~/server/app/models/test-data'
+import { getMockBuilding, getMockUser } from '~/server/app/models/test-data'
 import { buildForCases } from '~/util/test-util'
 
 type BuildingConfigurationKey =
@@ -50,20 +50,21 @@ const buildingConfigurations: Record<
   ],
 }
 
-export const aTest = test.extend<{
-  buildings: Record<BuildingConfigurationKey, Array<EnhancedBuilding>>
-}>({
-  buildings: async ({}, use) => {
-    await use(
-      JSON.parse(JSON.stringify(buildingConfigurations)) as Record<
-        BuildingConfigurationKey,
-        Array<EnhancedBuilding>
-      >,
-    )
-  },
-})
-
 describe('building model', () => {
+  const aTest = test.extend<{
+    buildings: Record<BuildingConfigurationKey, Array<EnhancedBuilding>>
+    // eslint-disable-next-line @vitest/valid-title
+  }>({
+    buildings: async ({}, use) => {
+      await use(
+        JSON.parse(JSON.stringify(buildingConfigurations)) as Record<
+          BuildingConfigurationKey,
+          Array<EnhancedBuilding>
+        >,
+      )
+    },
+  })
+
   describe('public interface', () => {
     describe('getScoreGeneration', () => {
       aTest.for(
@@ -131,7 +132,7 @@ describe('building model', () => {
           },
         }),
       )('when %s', ([testName, expected], { buildings }) => {
-        expect(getScoreGeneration(buildings[testName])).toEqual(expected)
+        expect(getScoreGeneration(buildings[testName])).toStrictEqual(expected)
       })
     })
 
@@ -206,8 +207,10 @@ describe('building model', () => {
             getMockBuilding(BuildingType.FARM, { unbuilt: true }),
           ],
         }),
-      )('when %s', ([testName, expectedCap], { buildings }) => {
-        expect(getUserBuildings(buildings[testName])).toEqual(expectedCap)
+      )('when %s', ([testName, expected], { buildings }) => {
+        expect(
+          getUserBuildings(getMockUser(), buildings[testName]),
+        ).toStrictEqual(expected)
       })
     })
 
@@ -217,7 +220,7 @@ describe('building model', () => {
           BuildingConfigurationKey,
           ReturnType<typeof getWarehouseCap>
         >({
-          'no buildings': 0,
+          'no buildings': 10,
           'town hall': 10,
           'upgraded town hall': 10,
           'town hall and one warehouse': 110,
@@ -225,8 +228,8 @@ describe('building model', () => {
           'town hall and multiple warehouses': 1010,
           'upgraded town hall and multiple upgraded warehouses': 2260,
         }),
-      )('when %s', ([testName, expectedCap], { buildings }) => {
-        expect(getWarehouseCap(buildings[testName])).toEqual(expectedCap)
+      )('when %s', ([testName, expected], { buildings }) => {
+        expect(getWarehouseCap(buildings[testName])).toStrictEqual(expected)
       })
     })
   })
@@ -237,7 +240,10 @@ describe('building model', () => {
         const building = getMockBuilding(BuildingType.TOWN_HALL, {
           skipEnhance: true,
         })
-        expect(enhanceBuilding(building, [building])).toEqual({
+
+        expect(
+          enhanceBuilding(building, [building], getMockUser()),
+        ).toStrictEqual({
           ...building,
           unbuildableReason: 'Town hall already built',
           upgradeCost: -1,
@@ -251,7 +257,7 @@ describe('building model', () => {
           return [BUILDINGS[type].name, type]
         }),
       )(`should return an unbuilt building for %s`, (_, type) => {
-        expect(unbuiltBuilding(type)).toEqual({
+        expect(unbuiltBuilding(type)).toStrictEqual({
           id: -1,
           createdById: '-1',
           type,
@@ -329,7 +335,7 @@ describe('building model', () => {
               skipEnhance: true,
             }),
           ],
-          { unbuildableReason: 'Build a house' },
+          { unbuildableReason: 'Build more houses' },
         ],
         [
           '0 farms and 1 house',
@@ -357,7 +363,7 @@ describe('building model', () => {
               skipEnhance: true,
             }),
           ],
-          { unbuildableReason: 'Build a house' },
+          { unbuildableReason: 'Build more houses' },
         ],
         [
           '1 farm and 4 houses',
@@ -385,7 +391,7 @@ describe('building model', () => {
               skipEnhance: true,
             }),
           ],
-          { unbuildableReason: 'Build a house' },
+          { unbuildableReason: 'Build more houses' },
         ],
         [
           '3 farms and 10 houses',
@@ -429,15 +435,15 @@ describe('building model', () => {
           { buildCost: 120 },
         ],
       ])('%s', (_, building, otherBuildings, expected) => {
-        expect(getBuildCost(building, [...otherBuildings, building])).toEqual(
-          expected,
-        )
+        expect(
+          getBuildCost(building, [...otherBuildings, building], getMockUser()),
+        ).toStrictEqual(expected)
       })
     })
 
     describe('getUpgradeCost', () => {
       test('not implemented', () => {
-        expect(getUpgradeCost()).toEqual({
+        expect(getUpgradeCost()).toStrictEqual({
           upgradeCost: -1,
           upgradeInfo: 'Upgrade not implemented',
         })
@@ -527,7 +533,7 @@ describe('building model', () => {
           { scorePerHour: 0 },
         ],
       ])('%s', (_, building, expected) => {
-        expect(getBuildingScoreGeneration(building)).toEqual(expected)
+        expect(getBuildingScoreGeneration(building)).toStrictEqual(expected)
       })
     })
   })

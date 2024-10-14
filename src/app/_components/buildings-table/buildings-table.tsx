@@ -10,6 +10,7 @@ import {
   TableTr,
   Tooltip,
 } from '@mantine/core'
+import { BuildingType } from '@prisma/client'
 import {
   IconHammer,
   IconHelp,
@@ -19,7 +20,10 @@ import { BuildingsMenu } from '~/app/_components/buildings-table/buildings-menu'
 import { BUILDINGS } from '~/app/_components/buildings-table/buildings-utils'
 import { DomainValue } from '~/app/_components/domain-value/domain-value'
 import { NotApplicable } from '~/app/_components/typography/not-applicable'
-import { type EnhancedBuilding } from '~/server/app/models/building'
+import {
+  getWarehouseCap,
+  type EnhancedBuilding,
+} from '~/server/app/models/building'
 
 export function BuildingsTable({
   buildings,
@@ -39,10 +43,12 @@ export function BuildingsTable({
         <TableTd>
           <div className="flex items-center gap-1 h-full">
             <BuildingIcon />
-            {name}
+            <div className="flex flex-col">
+              <div>{name}</div>
+              <div className="text-xs text-zinc-500">LVL {building.level}</div>
+            </div>
           </div>
         </TableTd>
-        <TableTd>{building.level}</TableTd>
         <TableTd>
           {building.upgradeCost < 0 ? (
             <Tooltip
@@ -56,32 +62,37 @@ export function BuildingsTable({
           )}
         </TableTd>
         <TableTd>
-          {building.unbuildableReason ?? !building.buildCost ? (
+          {building.buildCost ? (
+            <DomainValue value={building.buildCost} currency="RP" />
+          ) : (
             <Tooltip
               label={building.unbuildableReason}
               className="text-zinc-100 bg-zinc-800"
             >
               <NotApplicable />
             </Tooltip>
-          ) : (
-            <DomainValue value={building.buildCost} currency="RP" />
           )}
         </TableTd>
         <TableTd>
           <Tooltip
             label={
               <span>
-                Generates {building.scorePerHour} score per hour at current
-                level.
+                {building.type !== BuildingType.WAREHOUSE
+                  ? `Currently generates ${building.scorePerHour} score per hour.`
+                  : `Currently increases storage capacity by ${building.quantity * getWarehouseCap([building], false)}.`}
               </span>
             }
             className="text-zinc-100 bg-zinc-800"
           >
-            <IconHelp size={24} />
+            <div className="flex items-center">
+              <IconHelp size={24} />
+            </div>
           </Tooltip>
         </TableTd>
-        <TableTd className="flex justify-end">
-          <BuildingsMenu building={building} />
+        <TableTd>
+          <div className="h-full flex items-center justify-end">
+            <BuildingsMenu building={building} />
+          </div>
         </TableTd>
       </TableTr>
     )
@@ -93,18 +104,17 @@ export function BuildingsTable({
         <TableThead>
           <TableTr>
             <TableTh>Building</TableTh>
-            <TableTh>Level</TableTh>
             <TableTh>
-              <div className="flex items-center gap-1">
-                <div className="text-orange-600">
+              <div className="flex items-center gap-1 whitespace-nowrap">
+                <div className="flex items-center text-blue-600">
                   <IconSquareRoundedArrowUp />
                 </div>{' '}
                 Upgrade cost
               </div>
             </TableTh>
             <TableTh>
-              <div className="flex items-center gap-1">
-                <div className="text-green-800">
+              <div className="flex items-center gap-1 whitespace-nowrap">
+                <div className="flex items-center text-blue-600">
                   <IconHammer />
                 </div>{' '}
                 Building cost

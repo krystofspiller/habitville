@@ -4,16 +4,27 @@ const config = {
   parserOptions: {
     project: true,
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', '@vitest'],
   extends: [
     'next/core-web-vitals',
     'plugin:@typescript-eslint/recommended-type-checked',
     'plugin:@typescript-eslint/stylistic-type-checked',
+    'plugin:@vitest/legacy-all',
   ],
   rules: {
     // Custom
     semi: ['error', 'never'],
     '@typescript-eslint/no-unsafe-assignment': 'warn',
+    '@vitest/prefer-expect-assertions': 'off',
+    '@vitest/require-hook': 'off',
+    '@vitest/no-standalone-expect': 'off',
+    '@vitest/consistent-test-it': [
+      'error',
+      {
+        fn: 'test',
+        withinDescribe: 'test',
+      },
+    ],
 
     // T3 defaults
     '@typescript-eslint/array-type': 'off',

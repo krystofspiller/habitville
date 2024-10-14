@@ -32,7 +32,7 @@ describe('level', () => {
       currentLevelXpProgressAbs,
       currentLevelXpProgressPct,
     ) => {
-      expect(getLevel(xp)).toEqual(
+      expect(getLevel(xp)).toStrictEqual(
         expect.objectContaining({
           level,
           xpNeededForNextLevel,

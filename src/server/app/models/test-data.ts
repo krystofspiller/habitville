@@ -1,4 +1,4 @@
-import { type BuildingType, type Building } from '@prisma/client'
+import { type BuildingType, type Building, type User } from '@prisma/client'
 import {
   enhanceBuilding,
   type EnhancedBuilding,
@@ -18,6 +18,21 @@ type GetMockBuildingOptions<T extends true | false> = Partial<
 > & {
   skipEnhance?: T
   unbuilt?: true
+  user?: User
+}
+
+function getMockUser(): User {
+  return {
+    name: 'Mock User',
+    id: '1',
+    email: 'mock@example.com',
+    emailVerified: new Date(2024, 0, 1),
+    image: null,
+    balance: 1001,
+    xp: 1002,
+    score: 1003,
+    scoreCollectedAt: new Date(2024, 0, 1),
+  }
 }
 
 function getMockBuilding<
@@ -25,12 +40,19 @@ function getMockBuilding<
   R = T extends true ? Building : EnhancedBuilding,
 >(
   buildingType: BuildingType,
-  options: GetMockBuildingOptions<T> = { skipEnhance: false as T },
+  options: GetMockBuildingOptions<T> = {
+    skipEnhance: false as T,
+    user: getMockUser(),
+  },
 ): R {
+  options.user = options.user ?? getMockUser()
+
   if (options?.unbuilt) {
     const unbuilt = unbuiltBuilding(buildingType)
     return (
-      options.skipEnhance ? unbuilt : enhanceBuilding(unbuilt, [unbuilt])
+      options.skipEnhance
+        ? unbuilt
+        : enhanceBuilding(unbuilt, [unbuilt], options.user)
     ) as R
   }
 
@@ -49,10 +71,13 @@ function getMockBuilding<
 
   delete building.unbuilt
   delete building.skipEnhance
+  delete building.user
 
   return (
-    options.skipEnhance ? building : enhanceBuilding(building, [building])
+    options.skipEnhance
+      ? building
+      : enhanceBuilding(building, [building], options.user)
   ) as R
 }
 
-export { getMockBuilding }
+export { getMockUser, getMockBuilding }

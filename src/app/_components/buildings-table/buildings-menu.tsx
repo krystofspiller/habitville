@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Menu } from '@mantine/core'
+import { Button, Menu, Tooltip } from '@mantine/core'
 import {
   IconHammer,
   IconSquareRoundedArrowUp,
@@ -56,7 +56,12 @@ export function BuildingsMenu({ building }: { building: EnhancedBuilding }) {
       </Menu.Target>
 
       <Menu.Dropdown>
-        {building.buildCost && building.buildCost > 0 && (
+        <Tooltip
+          label={building.unbuildableReason}
+          className="text-zinc-100 bg-zinc-800"
+          data-disabled={!building.unbuildableReason}
+          position="left"
+        >
           <Menu.Item
             onClick={() => {
               createBuilding.mutate({ type: building.type })
@@ -64,10 +69,11 @@ export function BuildingsMenu({ building }: { building: EnhancedBuilding }) {
             className="text-green-600"
             color="green"
             leftSection={<IconHammer size={14} />}
+            data-disabled={!!building.unbuildableReason}
           >
-            Build
+            <div>Build</div>
           </Menu.Item>
-        )}
+        </Tooltip>
         <Menu.Divider />
         <Menu.Item
           onClick={() => {

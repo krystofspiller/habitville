@@ -1,9 +1,10 @@
-import { BuildingType, type Building } from '@prisma/client'
+import { BuildingType, type User, type Building } from '@prisma/client'
 import { BUILDINGS } from '~/app/_components/buildings-table/buildings-utils'
 
 type BuildCost =
   | { buildCost: number; unbuildableReason?: never }
   | { buildCost?: never; unbuildableReason: string }
+  | { buildCost: number; unbuildableReason: string }
 type UpgradeCostAndInfo = { upgradeCost: number; upgradeInfo?: string }
 type ScoreGeneration = { scorePerHour: number }
 type EnhancedBuilding = Building &
@@ -22,16 +23,20 @@ const unbuiltBuilding = (buildingType: BuildingType): Building => ({
 function enhanceBuilding(
   building: Building,
   buildings: Array<Building>,
+  user: User,
 ): EnhancedBuilding {
   return {
     ...building,
-    ...getBuildCost(building, buildings),
+    ...getBuildCost(building, buildings, user),
     ...getUpgradeCost(),
     ...getBuildingScoreGeneration(building),
   }
 }
 
-function getUserBuildings(buildings: Array<Building>): Array<EnhancedBuilding> {
+function getUserBuildings(
+  user: User,
+  buildings: Array<Building>,
+): Array<EnhancedBuilding> {
   const builtBuildings = buildings.reduce((acc, building) => {
     acc.push(building.type)
     return acc
@@ -53,30 +58,49 @@ function getUserBuildings(buildings: Array<Building>): Array<EnhancedBuilding> {
     }
   }
 
-  return buildings.map((building) => enhanceBuilding(building, buildings))
+  return buildings.map((building) => enhanceBuilding(building, buildings, user))
 }
 
 function getBuildCost(
   building: Building,
   buildings: Array<Building>,
+  user: User,
 ): BuildCost {
+  const buildCostAfterBalanceCheck = (buildCost: number): BuildCost => {
+    if (buildCost > user.balance) {
+      return { buildCost, unbuildableReason: 'Insufficient realized potential' }
+    }
+
+    return { buildCost }
+  }
+
   switch (building.type) {
     case BuildingType.TOWN_HALL:
-      return building.quantity === 0
-        ? { buildCost: 10 }
-        : { unbuildableReason: 'Town hall already built' }
-    case BuildingType.HOUSE:
-      return {
-        buildCost: Math.round(Math.pow(1.3, building.quantity) * 10),
+      if (building.quantity !== 0) {
+        return { unbuildableReason: 'Town hall already built' }
       }
+
+      return buildCostAfterBalanceCheck(10)
+    case BuildingType.HOUSE:
+      return buildCostAfterBalanceCheck(
+        Math.round(Math.pow(1.3, building.quantity) * 10),
+      )
     case BuildingType.FARM:
-      return (buildings.find((building) => building.type === BuildingType.HOUSE)
-        ?.quantity ?? -1) >
+      if (
+        (buildings.find((building) => building.type === BuildingType.HOUSE)
+          ?.quantity ?? -1) <=
         building.quantity * 3
-        ? { buildCost: Math.round(Math.pow(2, building.quantity * 1.2) * 20) }
-        : { unbuildableReason: 'Build a house' }
+      ) {
+        return { unbuildableReason: 'Build more houses' }
+      }
+
+      return buildCostAfterBalanceCheck(
+        Math.round(Math.pow(2, building.quantity * 1.2) * 20),
+      )
     case BuildingType.WAREHOUSE:
-      return { buildCost: Math.round(Math.pow(2, building.quantity) * 15) }
+      return buildCostAfterBalanceCheck(
+        Math.round(Math.pow(2, building.quantity) * 15),
+      )
     default:
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       throw new Error(`Unexpected type ${building.type}`)
@@ -123,16 +147,17 @@ function getScoreGeneration(buildings: Array<EnhancedBuilding>) {
   )
 }
 
-function getWarehouseCap(buildings: Array<Building>): number {
-  return buildings.reduce((acc, building) => {
-    if (building.type === BuildingType.WAREHOUSE) {
-      return acc + building.quantity * 100 * Math.pow(1.5, building.level - 1)
-    } else if (building.type === BuildingType.TOWN_HALL) {
-      return acc + 10
-    }
-
-    return acc
-  }, 0)
+function getWarehouseCap(
+  buildings: Array<Building>,
+  includeInitialCap = true,
+): number {
+  const initialCap = includeInitialCap ? 10 : 0
+  const warehouse = buildings.find(
+    (building) => building.type === BuildingType.WAREHOUSE,
+  )
+  return warehouse
+    ? initialCap + warehouse.quantity * 100 * Math.pow(1.5, warehouse.level - 1)
+    : initialCap
 }
 
 export {
