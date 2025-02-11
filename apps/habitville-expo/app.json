@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "habitville-expo",
+    "name": "HabitVille",
     "slug": "habitville-expo",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,18 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "supportsTablet": true,
+      "bundleIdentifier": "com.laegas.habitville-expo"
     },
     "plugins": [
       "expo-router",
