@@ -31,3 +31,7 @@ bun run dev
 ```
 bun run test
 ```
+
+TODO:
+
+* unify tsconfigs from Convex

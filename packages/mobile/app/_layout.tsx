@@ -1,8 +1,13 @@
+import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { SplashScreen, Stack } from "expo-router"
 import { useFonts } from 'expo-font'
 
 import "../global.css"
 import { useEffect } from "react";
+
+const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
+  unsavedChangesWarning: false,
+});
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -29,8 +34,10 @@ export default function RootLayout() {
   }
   
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{headerShown: false}} />
-    </Stack>
+    <ConvexProvider client={convex}>
+      <Stack>
+        <Stack.Screen name="index" options={{headerShown: false}} />
+      </Stack>
+    </ConvexProvider>
   )
 }
