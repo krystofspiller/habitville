@@ -1,7 +1,7 @@
-import { View } from "react-native";
-import { Redirect } from "expo-router";
-import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
-import { Loader } from "~/components/ui/loader";
+import { View } from 'react-native'
+import { Redirect } from 'expo-router'
+import { Authenticated, Unauthenticated, AuthLoading } from 'convex/react'
+import { Loader } from '~/components/ui/loader'
 
 export default function Index() {
   return (

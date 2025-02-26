@@ -1,8 +1,9 @@
 module.exports = {
-  extends: ['expo', 'plugin:@typescript-eslint/recommended-type-checked', "plugin:import/errors",
+  extends: ['expo', 'prettier', 'plugin:@typescript-eslint/recommended-type-checked', "plugin:import/errors",
     "plugin:import/warnings", 'plugin:import/typescript'],
   ignorePatterns: ['/dist/*'],
   rules: {
+    'prettier/prettier': 'error',
     "@typescript-eslint/unbound-method": "off",
   },
   parser: "@typescript-eslint/parser",
@@ -12,6 +13,7 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
   plugins: [
+    'prettier',
     "@typescript-eslint",
     "import"
   ],
@@ -25,5 +27,5 @@ module.exports = {
       }
     }
   },
-  ignorePatterns: ['.eslintrc.js', 'tailwind.config.ts', 'metro.config.js', 'babel.config.js', 'convex/_generated/**/*.js']
+  ignorePatterns: ['prettier.config.js', '.eslintrc.js', 'tailwind.config.ts', 'metro.config.js', 'babel.config.js', 'convex/_generated/**/*.js']
 };

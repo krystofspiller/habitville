@@ -1,6 +1,6 @@
-import { Stack } from "expo-router";
+import { Stack } from 'expo-router'
 
-export default function AuthLayout () {
+export default function AuthLayout() {
   return (
     <Stack>
       <Stack.Screen
@@ -10,5 +10,5 @@ export default function AuthLayout () {
         }}
       />
     </Stack>
-  );
-};
+  )
+}

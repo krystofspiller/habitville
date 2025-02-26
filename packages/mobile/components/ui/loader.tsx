@@ -1,10 +1,10 @@
-import { View, ActivityIndicator, Dimensions, Platform } from "react-native";
+import { View, ActivityIndicator, Dimensions, Platform } from 'react-native'
 
 const Loader = ({ isLoading }: { isLoading: boolean }) => {
-  const osName = Platform.OS;
-  const screenHeight = Dimensions.get("screen").height;
+  const osName = Platform.OS
+  const screenHeight = Dimensions.get('screen').height
 
-  if (!isLoading) return null;
+  if (!isLoading) return null
 
   return (
     <View
@@ -16,10 +16,10 @@ const Loader = ({ isLoading }: { isLoading: boolean }) => {
       <ActivityIndicator
         animating={isLoading}
         color="#fff"
-        size={osName === "ios" ? "large" : 50}
+        size={osName === 'ios' ? 'large' : 50}
       />
     </View>
-  );
-};
+  )
+}
 
-export { Loader };
+export { Loader }
