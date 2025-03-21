@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 import * as React from 'react'
 import { Pressable } from 'react-native'
-import { cn } from '~/lib/utils'
+import { cn } from '~/lib/utils/cn'
 import { TextClassContext } from '~/components/ui/text'
 
 const buttonVariants = cva(
@@ -62,6 +62,7 @@ const buttonTextVariants = cva(
 type ButtonProps = React.ComponentPropsWithoutRef<typeof Pressable> &
   VariantProps<typeof buttonVariants>
 
+// TODO: support loading state
 const Button = React.forwardRef<
   React.ElementRef<typeof Pressable>,
   ButtonProps
