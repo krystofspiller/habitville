@@ -1,0 +1,2 @@
+- lint react-native Text import
+- tooltips on moment (currency) and score

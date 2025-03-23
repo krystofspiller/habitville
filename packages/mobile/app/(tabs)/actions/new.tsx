@@ -2,8 +2,14 @@ import { SafeAreaView } from 'react-native'
 import { useAppForm } from '~/lib/utils/form'
 import { z } from 'zod'
 import { Form } from '~/components/form/form'
+import { useMutation } from 'convex/react'
+import { api } from '~/convex/_generated/api'
+import { useRouter } from 'expo-router'
 
 export default function NewAction() {
+  const router = useRouter()
+  const createAction = useMutation(api.actions.createAction)
+
   const form = useAppForm({
     defaultValues: {
       name: '',
@@ -15,9 +21,9 @@ export default function NewAction() {
         effect: z.number({ coerce: true }),
       }),
     },
-    onSubmit: ({ value }) => {
-      // TODO: submit the form
-      console.log('DEBUG', value, 'JSON', JSON.stringify(value, null, 2))
+    onSubmit: async ({ value }) => {
+      await createAction({ name: value.name, effect: value.effect })
+      router.back()
     },
   })
 

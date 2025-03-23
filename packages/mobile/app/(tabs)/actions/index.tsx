@@ -1,31 +1,97 @@
 import { api } from '~/convex/_generated/api'
 import { useQuery } from 'convex/react'
-import { SafeAreaView, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { Text } from '~/components/ui/text'
 import { Link } from 'expo-router'
 import { Button } from '~/components/ui/button'
+import { FlashList } from '@shopify/flash-list'
+import * as React from 'react'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '~/components/ui/table'
+import { cn } from '~/lib/utils/cn'
+import { Ellipsis } from '~/lib/icons'
+import UserInfoLayout from '~/components/userInfoLayout'
 
 export default function Actions() {
-  const tasks = useQuery(api.tasks.get)
+  const actions = useQuery(api.actions.getUserActions)
+
+  const insets = useSafeAreaInsets()
 
   return (
-    <SafeAreaView className="flex m-4">
+    <UserInfoLayout>
       <View className="flex flex-row items-center justify-between">
         <Text variant="h1">Actions</Text>
 
         <Link push href="/actions/new" asChild>
-          <Button>
+          <Button variant="ghost">
             <Text>Add action</Text>
           </Button>
         </Link>
       </View>
-
-      <Text className="text-lg text-muted-foreground">Tasks</Text>
-      {tasks?.map((item) => (
-        <Text className="text-sm text-muted-foreground" key={item._id}>
-          {item.text}
-        </Text>
-      ))}
-    </SafeAreaView>
+      <ScrollView bounces={false} showsHorizontalScrollIndicator={false}>
+        <Table className="min-w-full">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="px-4 w-[40%]">
+                <Text>Name</Text>
+              </TableHead>
+              <TableHead className="w-[40%]">
+                <Text>Effect</Text>
+              </TableHead>
+              <TableHead className="w-[20%]" />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <FlashList
+              data={actions}
+              estimatedItemSize={45}
+              contentContainerStyle={{
+                paddingBottom: insets.bottom,
+              }}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item: action, index }) => (
+                <TableRow
+                  onPress={() => {
+                    // TODO:
+                    alert('You pressed the row.')
+                  }}
+                  key={action._id}
+                  className={cn(
+                    'active:bg-secondary',
+                    index % 2 && 'bg-muted/40 ',
+                  )}
+                >
+                  <TableCell className="w-[40%]">
+                    <Text>{action.name}</Text>
+                  </TableCell>
+                  <TableCell className="w-[40%]">
+                    <Text>{action.effect}</Text>
+                  </TableCell>
+                  <TableCell className="w-[20%] items-end justify-center p-0">
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onPress={() => {
+                        // TODO: same function as table row above
+                        alert('You pressed the ellipsis.')
+                      }}
+                    >
+                      <Ellipsis className="text-foreground" size="32px" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )}
+            />
+          </TableBody>
+        </Table>
+      </ScrollView>
+    </UserInfoLayout>
   )
 }

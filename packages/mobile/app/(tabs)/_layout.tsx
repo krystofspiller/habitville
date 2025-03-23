@@ -1,9 +1,7 @@
 import { Redirect, Tabs } from 'expo-router'
 import { Text, View } from 'react-native'
 
-import { List } from '~/lib/icons/List'
-import { Profile } from '~/lib/icons/Profile'
-import { House } from '~/lib/icons/House'
+import { House, List, Profile } from '~/lib/icons'
 import { Loader } from '~/components/ui/loader'
 import { useConvexAuth } from 'convex/react'
 import { LucideIcon } from 'lucide-react-native'

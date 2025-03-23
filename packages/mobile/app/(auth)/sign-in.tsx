@@ -13,6 +13,15 @@ export default function SignIn() {
   const [step, setStep] = useState<'signUp' | 'signIn'>('signIn')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+
+  const logIn = async () => {
+    try {
+      await signIn('password', { email, password, flow: step })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   return (
     <View className="flex-1 gap-2 items-center justify-center">
       <AuthLoading>
@@ -38,11 +47,7 @@ export default function SignIn() {
           value={password}
           secureTextEntry
         />
-        <Button
-          onPress={() => {
-            void signIn('password', { email, password, flow: step })
-          }}
-        >
+        <Button onPress={() => void logIn()}>
           <Text>{step === 'signIn' ? 'Sign in' : 'Sign up'}</Text>
         </Button>
         <Button
