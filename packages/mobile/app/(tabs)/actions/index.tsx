@@ -38,13 +38,13 @@ export default function Actions() {
         <Table className="min-w-full">
           <TableHeader>
             <TableRow>
-              <TableHead className="px-4 w-[40%]">
+              <TableHead className="px-4 w-[65%]">
                 <Text>Name</Text>
               </TableHead>
-              <TableHead className="w-[40%]">
+              <TableHead className="w-[20%]">
                 <Text>Effect</Text>
               </TableHead>
-              <TableHead className="w-[20%]" />
+              <TableHead className="w-[15%]" />
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -66,13 +66,13 @@ export default function Actions() {
                     index % 2 && 'bg-muted/40 ',
                   )}
                 >
-                  <TableCell className="w-[40%]">
+                  <TableCell className="w-[65%]">
                     <Text>{action.name}</Text>
                   </TableCell>
-                  <TableCell className="w-[40%]">
+                  <TableCell className="w-[20%]">
                     <Text>{action.effect}</Text>
                   </TableCell>
-                  <TableCell className="w-[20%] items-end justify-center p-0">
+                  <TableCell className="w-[15%] items-end justify-center p-0">
                     <Button
                       variant="link"
                       size="sm"
