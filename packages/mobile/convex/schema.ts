@@ -12,9 +12,9 @@ const schema = defineSchema({
     phone: v.optional(v.string()),
     phoneVerificationTime: v.optional(v.number()),
     isAnonymous: v.optional(v.boolean()),
-    balance: v.optional(v.float64()),
-    score: v.optional(v.int64()),
-    scoreCollectedAt: v.optional(v.int64()),
+    balance: v.optional(v.number()),
+    score: v.optional(v.number()),
+    scoreCollectedAt: v.optional(v.number()),
   })
     .index('email', ['email'])
     .index('phone', ['phone']),
@@ -27,11 +27,12 @@ const schema = defineSchema({
   performedActions: defineTable({
     actionId: v.id('actions'),
     userId: v.id('users'),
+    quantity: v.number(),
   }),
   buildings: defineTable({
-    type: v.int64(),
-    quantity: v.int64(),
-    level: v.int64(),
+    type: v.number(),
+    quantity: v.number(),
+    level: v.number(),
     userId: v.id('users'),
   }),
 })

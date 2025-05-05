@@ -1,6 +1,7 @@
 import { query, mutation } from './_generated/server'
 import { getAuthUserId } from '@convex-dev/auth/server'
 import { v } from 'convex/values'
+import { internal } from './_generated/api'
 
 export const getUserActions = query({
   args: {},
@@ -32,5 +33,32 @@ export const createAction = mutation({
       userId,
     })
     return newTaskId
+  },
+})
+
+export const recordAction = mutation({
+  args: { actionId: v.id('actions'), quantity: v.number() },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx)
+    if (userId === null) {
+      throw new Error('401 - Unauthenticated')
+    }
+
+    const action = await ctx.db.get(args.actionId)
+    if (action === null) {
+      throw new Error('Action not found')
+    }
+
+    await Promise.all([
+      ctx.runMutation(internal.users.updateUserBalance, {
+        id: userId,
+        balance: action.effect * args.quantity,
+      }),
+      ctx.db.insert('performedActions', {
+        actionId: args.actionId,
+        userId,
+        quantity: args.quantity,
+      }),
+    ])
   },
 })

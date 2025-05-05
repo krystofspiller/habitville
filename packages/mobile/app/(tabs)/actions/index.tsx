@@ -1,5 +1,5 @@
 import { api } from '~/convex/_generated/api'
-import { useQuery } from 'convex/react'
+import { useMutation, useQuery } from 'convex/react'
 import { ScrollView, View } from 'react-native'
 import { Text } from '~/components/ui/text'
 import { Link } from 'expo-router'
@@ -21,6 +21,7 @@ import UserInfoLayout from '~/components/userInfoLayout'
 
 export default function Actions() {
   const actions = useQuery(api.actions.getUserActions)
+  const recordAction = useMutation(api.actions.recordAction)
 
   const insets = useSafeAreaInsets()
 
@@ -30,9 +31,7 @@ export default function Actions() {
         <Text variant="h1">Actions</Text>
 
         <Link push href="/actions/new" asChild>
-          <Button variant="ghost">
-            <Text>Add action</Text>
-          </Button>
+          <Text className="text-muted-foreground">Add action</Text>
         </Link>
       </View>
       <ScrollView bounces={false} showsHorizontalScrollIndicator={false}>
@@ -59,8 +58,7 @@ export default function Actions() {
               renderItem={({ item: action, index }) => (
                 <TableRow
                   onPress={() => {
-                    // TODO:
-                    alert('You pressed the row.')
+                    void recordAction({ actionId: action._id, quantity: 1 })
                   }}
                   key={action._id}
                   className={cn(
@@ -79,8 +77,7 @@ export default function Actions() {
                       variant="link"
                       size="sm"
                       onPress={() => {
-                        // TODO: same function as table row above
-                        alert('You pressed the ellipsis.')
+                        void recordAction({ actionId: action._id, quantity: 1 })
                       }}
                     >
                       <Ellipsis className="text-foreground" size="32px" />

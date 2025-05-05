@@ -38,7 +38,7 @@ const TabLayout = () => {
 
   const tabs = [
     { icon: List, name: 'actions', title: 'Actions' },
-    { icon: House, name: 'ville', title: 'Ville' },
+    { icon: House, name: 'ville', title: 'HabitVille' },
     { icon: Profile, name: 'profile', title: 'Profile' },
   ]
 
