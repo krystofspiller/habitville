@@ -57,7 +57,8 @@ export function ScoreCard() {
       )
     : 0
   const scoreCapPercentage = user.data
-    ? accumulatedScore / user.data.warehouseCap
+    ? accumulatedScore /
+      (user.data.warehouseCap === 0 ? 1 : user.data.warehouseCap)
     : 0
   const scoreCapStyle =
     scoreCapPercentage < 0.5

@@ -10,11 +10,7 @@ import {
   TableTr,
   Tooltip,
 } from '@mantine/core'
-import {
-  IconHammer,
-  IconHelp,
-  IconSquareRoundedArrowUp,
-} from '@tabler/icons-react'
+import { IconHammer, IconHelp } from '@tabler/icons-react'
 import { BuildingsMenu } from '~/app/_components/buildings-table/buildings-menu'
 import { BUILDINGS } from '~/app/_components/buildings-table/buildings-utils'
 import { DomainValue } from '~/app/_components/domain-value/domain-value'
@@ -44,19 +40,7 @@ export function BuildingsTable({
         </TableTd>
         <TableTd>{building.level}</TableTd>
         <TableTd>
-          {building.upgradeCost < 0 ? (
-            <Tooltip
-              label={building.upgradeInfo}
-              className="text-zinc-100 bg-zinc-800"
-            >
-              <NotApplicable />
-            </Tooltip>
-          ) : (
-            <DomainValue value={building.upgradeCost} currency="RP" />
-          )}
-        </TableTd>
-        <TableTd>
-          {building.unbuildableReason ?? !building.buildCost ? (
+          {(building.unbuildableReason ?? !building.buildCost) ? (
             <Tooltip
               label={building.unbuildableReason}
               className="text-zinc-100 bg-zinc-800"
@@ -94,14 +78,6 @@ export function BuildingsTable({
           <TableTr>
             <TableTh>Building</TableTh>
             <TableTh>Level</TableTh>
-            <TableTh>
-              <div className="flex items-center gap-1">
-                <div className="text-orange-600">
-                  <IconSquareRoundedArrowUp />
-                </div>{' '}
-                Upgrade cost
-              </div>
-            </TableTh>
             <TableTh>
               <div className="flex items-center gap-1">
                 <div className="text-green-800">
