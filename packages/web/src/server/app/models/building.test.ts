@@ -329,7 +329,7 @@ describe('building model', () => {
               skipEnhance: true,
             }),
           ],
-          { unbuildableReason: 'Build a house' },
+          { unbuildableReason: 'Build more houses' },
         ],
         [
           '0 farms and 1 house',
@@ -357,7 +357,7 @@ describe('building model', () => {
               skipEnhance: true,
             }),
           ],
-          { unbuildableReason: 'Build a house' },
+          { unbuildableReason: 'Build more houses' },
         ],
         [
           '1 farm and 4 houses',
@@ -385,7 +385,7 @@ describe('building model', () => {
               skipEnhance: true,
             }),
           ],
-          { unbuildableReason: 'Build a house' },
+          { unbuildableReason: 'Build more houses' },
         ],
         [
           '3 farms and 10 houses',

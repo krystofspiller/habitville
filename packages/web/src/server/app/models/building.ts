@@ -74,7 +74,7 @@ function getBuildCost(
         ?.quantity ?? -1) >
         building.quantity * 3
         ? { buildCost: Math.round(Math.pow(2, building.quantity * 1.2) * 20) }
-        : { unbuildableReason: 'Build a house' }
+        : { unbuildableReason: 'Build more houses' }
     case BuildingType.WAREHOUSE:
       return { buildCost: Math.round(Math.pow(2, building.quantity) * 15) }
     default:

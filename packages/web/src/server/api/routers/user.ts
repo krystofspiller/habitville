@@ -8,7 +8,7 @@ import {
 import { getCollectScoreInfo } from '~/server/app/models/user'
 import { getLevel } from '~/util/level'
 
-async function getUser(userId: string, db: PrismaClient) {
+export async function getUser(userId: string, db: PrismaClient) {
   const user = await db.user.findFirst({
     where: { id: userId },
   })
